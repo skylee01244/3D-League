@@ -17,6 +17,9 @@ int main()
 
 
     while (window.isOpen()) {
+
+        //-----------------------------------UPDATE-------------------------------------------
+
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -32,11 +35,19 @@ int main()
         rectanglePosition.y += yVelocity;
         rect.setPosition(rectanglePosition);
 
+        //-----------------------------------UPDATE-------------------------------------------
+
+
+
+        //-----------------------------------DRAW-------------------------------------------
+
         //render
         window.clear();
         window.draw(rect);
 
         window.display();
+
+        //-----------------------------------DRAW-------------------------------------------
     }
 
     return 0;
