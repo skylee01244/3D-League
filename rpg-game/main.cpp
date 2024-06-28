@@ -7,7 +7,7 @@ int main()
 
     sf::RectangleShape rect;
     sf::Vector2f rectanglePosition(600, 350);
-    sf::Vector2f rectangleSize(100, 100);
+    sf::Vector2f rectangleSize(120, 120);
 
     rect.setPosition(rectanglePosition);
     rect.setSize(rectangleSize);
@@ -24,8 +24,8 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { window.close(); }
         }
         //out of bounds
-        if (rectanglePosition.x < 0 || rectanglePosition.x > 1280-100) { xVelocity *= -1; }
-        if (rectanglePosition.y < 0 || rectanglePosition.y > 720-100) { yVelocity *= -1; }
+        if (rectanglePosition.x < 0 || rectanglePosition.x > 1280-120) { xVelocity *= -1; }
+        if (rectanglePosition.y < 0 || rectanglePosition.y > 720-120) { yVelocity *= -1; }
 
         //physics
         rectanglePosition.x += xVelocity;
