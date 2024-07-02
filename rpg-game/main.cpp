@@ -3,28 +3,38 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1000, 720), "RPG Game"); //(1280, 720)
-    window.setFramerateLimit(60);
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "RPG Game", sf::Style::Default, settings);
+    //window.setFramerateLimit(60);
 
-    //Rectangle 1 (Left)
-    sf::RectangleShape rect1;
-    sf::Vector2f rect1Position(430, 350);
-    sf::Vector2f rect1Size(100, 100);
 
-    rect1.setPosition(rect1Position);
-    rect1.setSize(rect1Size);
+    //-----------------------------------LOAD-------------------------------------------
+    sf::Texture playerTexture;
+    sf::Sprite playerSprite;
 
-    sf::Vector2f rect1Velocity(-1, 0);
+    if (playerTexture.loadFromFile("Assets/Player/Textures/spritesheet.png"))
+    {
+        std::cout << "Player image loaded!" << std::endl;
+        playerSprite.setTexture(playerTexture);
 
-    //Rectangle 2 (Right)
-    sf::RectangleShape rect2;
-    sf::Vector2f rect2Position(855, 350);
-    sf::Vector2f rect2Size(100, 100);
+        int XIndex = 0;
+        int YIndex = 0;
 
-    rect2.setPosition(rect2Position);
-    rect2.setSize(rect2Size);
+        playerSprite.setTextureRect(sf::IntRect(XIndex * 64, YIndex * 64, 64, 64));
+        playerSprite.scale(sf::Vector2f(2.5, 2.5));
+    }
+    else
+    {
+        std::cout << "Player image failed to load!" << std::endl;
+    }
     
-    sf::Vector2f rect2Velocity(1, 0);
+    //-----------------------------------LOAD-------------------------------------------
+
+
+    sf::Vector2f playerPosition(sf::Vector2f(1280 / 2, 720 / 2));
+    playerSprite.setPosition(playerPosition);
+
 
 
     while (window.isOpen()) {
@@ -38,45 +48,49 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { window.close(); }
         }
         //out of bounds
-        if (rect1Position.x < 0 || rect1Position.x > 1000 -100) { rect1Velocity.x *= -1; }
-        if (rect1Position.y < 0 || rect1Position.y > 720-100) { rect1Velocity.y *= -1; }
 
-        if (rect2Position.x < 0 || rect2Position.x > 1000 - 100) { rect2Velocity.x *= -1; }
-        if (rect2Position.y < 0 || rect2Position.y > 720 - 100) { rect2Velocity.y *= -1; }
-
-        // Head on collision
-        if (rect1Position.x + 100 > rect2Position.x && rect1Position.y + 100 > rect2Position.y && rect1Position.y < rect2Position.y) {
-            rect1Velocity.x *= -1;
-            rect2Velocity.x *= -1;
-            std::cout << "HEAD ON COLLISION" << std::endl;
+        sf::Vector2f position = playerSprite.getPosition();
+        if (position.x < 0) {
+            sf::Vector2f position = playerSprite.getPosition();
+            playerSprite.setPosition(position + sf::Vector2f(0, position.y));
         }
-        // Reverse Head on collision
-        else if (rect1Position.x < rect2Position.x + 100 && rect1Position.y + 100 > rect2Position.y && rect1Position.y < rect2Position.y) {
-            rect1Velocity.x *= -1;
-            rect2Velocity.x *= -1;
-            std::cout << "REVERSE HEAD ON COLLISION" << std::endl;
+        if (position.x > 1280 - 64 * 3) {
+            sf::Vector2f position = playerSprite.getPosition();
+            playerSprite.setPosition(position + sf::Vector2f(1280 - 64 * 3, position.y));
         }
-        // On top collision
-        else if (rect1Position.y < rect2Position.y + 100 && rect1Position.x + 100 > rect2Position.x && rect1Position.x < rect2Position.x) {
-            rect1Velocity.y *= -1;
-            rect2Velocity.y *= -1;
-            std::cout << "ON TOP COLLISION" << std::endl;
+        if (position.y < 0) {
+            sf::Vector2f position = playerSprite.getPosition();
+            playerSprite.setPosition(position + sf::Vector2f(position.x, 0));
         }
-        // On bottom collision
-        else if (rect1Position.y + 100 > rect2Position.y && rect1Position.x + 100 > rect2Position.x && rect1Position.x < rect2Position.x) {
-            rect1Velocity.y *= -1;
-            rect2Velocity.y *= -1;
-            std::cout << "BELOW COLLISION" << std::endl;
+        if (position.y > 720 - 64 * 3) {
+            sf::Vector2f position = playerSprite.getPosition();
+            playerSprite.setPosition(position + sf::Vector2f(position.x, 720 - 64 * 3));
         }
 
-        //physics
-        rect1Position.x += rect1Velocity.x;
-        rect1Position.y += rect1Velocity.y;
-        rect1.setPosition(rect1Position);
 
-        rect2Position.x += rect2Velocity.x;
-        rect2Position.y += rect2Velocity.y;
-        rect2.setPosition(rect2Position);
+        // Movement
+        int playerVelocity = 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        {
+            sf::Vector2f position = playerSprite.getPosition();
+            playerSprite.setPosition(position + sf::Vector2f(0, -playerVelocity));
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        {
+            sf::Vector2f position = playerSprite.getPosition();
+            playerSprite.setPosition(position + sf::Vector2f(-playerVelocity, 0));
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        {
+            sf::Vector2f position = playerSprite.getPosition();
+            playerSprite.setPosition(position + sf::Vector2f(0, playerVelocity));
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        {
+            sf::Vector2f position = playerSprite.getPosition();
+            playerSprite.setPosition(position + sf::Vector2f(playerVelocity, 0));
+        }
+
 
         //-----------------------------------UPDATE-------------------------------------------
 
@@ -86,9 +100,7 @@ int main()
 
         //render
         window.clear();
-        window.draw(rect1);
-        window.draw(rect2);
-
+        window.draw(playerSprite);
         window.display();
 
         //-----------------------------------DRAW-------------------------------------------
