@@ -19,16 +19,40 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "RPG Game", sf::Style::Default, settings);
     //window.setFramerateLimit(60);
 
-    sf::RectangleShape bullet(sf::Vector2f(25, 25));
-    bullet.setPosition(sf::Vector2f(50, 50));
+    std::vector<sf::RectangleShape> bullets;
+
+
+    float bulletSpeed = 0.5f;
 
     //-----------------------------------LOAD-------------------------------------------
+    //-----------------------------------ENEMY-------------------------------------------
+    sf::Texture enemyTexture;
+    sf::Sprite enemySprite;
+
+    if (enemyTexture.loadFromFile("Assets/Enemy/Textures/spritesheet.png"))
+    {
+        std::cout << "Enemy texture loaded!" << std::endl;
+        enemySprite.setTexture(enemyTexture);
+        enemySprite.setPosition(sf::Vector2f(200, 200));
+
+        int XIndex = 0;
+        int YIndex = 0;
+
+        enemySprite.setTextureRect(sf::IntRect(XIndex * 64, YIndex * 64, 64, 64));
+        enemySprite.scale(sf::Vector2f(2.5, 2.5));
+    }
+    else
+    {
+        std::cout << "Enemy texture failed to load!" << std::endl;
+    }
+    //-----------------------------------ENEMY-------------------------------------------
+    //-----------------------------------PLAYER-------------------------------------------
     sf::Texture playerTexture;
     sf::Sprite playerSprite;
 
     if (playerTexture.loadFromFile("Assets/Player/Textures/spritesheet.png"))
     {
-        std::cout << "Player image loaded!" << std::endl;
+        std::cout << "Player texture loaded!" << std::endl;
         playerSprite.setTexture(playerTexture);
 
         int XIndex = 0;
@@ -39,21 +63,16 @@ int main()
     }
     else
     {
-        std::cout << "Player image failed to load!" << std::endl;
+        std::cout << "Player texture failed to load!" << std::endl;
     }
-    
+    sf::Vector2f playerPosition(sf::Vector2f(1920 / 2 - 64, 1080 / 2 - 64));
+    playerSprite.setPosition(playerPosition);
+    //-----------------------------------PLAYER-------------------------------------------
     //-----------------------------------LOAD-------------------------------------------
 
 
-    sf::Vector2f playerPosition(sf::Vector2f(1920 / 2 - 64, 1080 / 2 - 64));
-    playerSprite.setPosition(playerPosition);
-
-    // Calculate direction of bullet
-    sf::Vector2f direction = skeleton
-
 
     while (window.isOpen()) {
-
         //-----------------------------------UPDATE-------------------------------------------
 
         sf::Event event;
@@ -62,6 +81,7 @@ int main()
             if (event.type == sf::Event::Closed) { window.close(); }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { window.close(); }
         }
+
 
         // Movement
         int playerVelocity = 1;
@@ -85,6 +105,21 @@ int main()
             sf::Vector2f position = playerSprite.getPosition();
             playerSprite.setPosition(position + sf::Vector2f(playerVelocity, 0));
         }
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        {
+            bullets.push_back(sf::RectangleShape(sf::Vector2f(50, 25)));
+            int i = bullets.size() - 1;
+            bullets[i].setPosition(playerSprite.getPosition());            
+        }
+
+        for (size_t i = 0; i < bullets.size(); i++) 
+        {
+            sf::Vector2f bulletdirection = enemySprite.getPosition() - bullets[i].getPosition();
+            bulletdirection = NormaliseVector(bulletdirection);
+            bullets[i].setPosition(bullets[i].getPosition() + bulletdirection * bulletSpeed);
+        }
+
 
         //out of bounds
 
@@ -110,7 +145,11 @@ int main()
 
         //render
         window.clear();
+        window.draw(enemySprite);
         window.draw(playerSprite);
+        for (size_t i = 0; i < bullets.size(); i++) {
+            window.draw(bullets[i]);
+        }
         window.display();
 
         //-----------------------------------DRAW-------------------------------------------
