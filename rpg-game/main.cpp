@@ -54,7 +54,7 @@ int main()
         enemy.Draw(window);
         player.Draw(window);
         frameRate.Draw(window);
-        window.display()
+        window.display();
         //-----------------------------------DRAW-------------------------------------------
     }
 

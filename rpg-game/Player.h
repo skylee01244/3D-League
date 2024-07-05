@@ -9,6 +9,8 @@ private:
 
 	std::vector<sf::RectangleShape> bullets;
 	float bulletSpeed;
+	float maxFireRate;
+	float fireRateTimer;
 	float playerSpeed;
 	sf::RectangleShape boundingRectangle;
 

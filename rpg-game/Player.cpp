@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Math.h"
 
-Player::Player() : bulletSpeed(0.3f), playerSpeed(1.0f)
+Player::Player() : bulletSpeed(0.3f), playerSpeed(1.0f), maxFireRate(1000), fireRateTimer(0)
 {
 }
 
@@ -83,11 +83,16 @@ void Player::Update(float deltaTime, Enemy& enemy)
         sprite.setPosition(position.x, 1080 - 64 * 2.5);
     }
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+    //----------------------------------------------------------------------------------------------------------
+    fireRateTimer += deltaTime;
+    
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && fireRateTimer >= maxFireRate)
     {
         bullets.push_back(sf::RectangleShape(sf::Vector2f(50, 25)));
         int i = bullets.size() - 1;
         bullets[i].setPosition(sprite.getPosition());
+
+        fireRateTimer = 0;
     }
 
     for (size_t i = 0; i < bullets.size(); i++)
@@ -95,14 +100,14 @@ void Player::Update(float deltaTime, Enemy& enemy)
         sf::Vector2f bulletdirection = enemy.sprite.getPosition() - bullets[i].getPosition();
         bulletdirection = Math::NormaliseVector(bulletdirection);
         bullets[i].setPosition(bullets[i].getPosition() + bulletdirection * bulletSpeed * deltaTime);
+        
+        if (Math::DidRectCollide(bullets[i].getGlobalBounds(), enemy.sprite.getGlobalBounds()))
+        {
+            std::cout << "COLLISION" << std::endl;
+        }
     }
 
     boundingRectangle.setPosition(sprite.getPosition());
-
-    if (Math::DidRectCollide(sprite.getGlobalBounds(), enemy.sprite.getGlobalBounds()))
-    {
-        std::cout << "COLLISION" << std::endl;
-    }
 }
 
 void Player::Draw(sf::RenderWindow& window)
