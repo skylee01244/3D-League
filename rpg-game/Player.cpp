@@ -94,7 +94,7 @@ void Player::Update(float deltaTime, Enemy& enemy)
     if (Math::DidRectCollide(sprite.getGlobalBounds(), enemy.sprite.getGlobalBounds()))
     {
         std::cout << "COLLISION" << std::endl;
-    } else { std::cout << "NOT COLLIDING" << std::endl; }
+    }
 }
 
 void Player::Draw(sf::RenderWindow& window)
