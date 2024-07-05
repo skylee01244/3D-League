@@ -12,6 +12,8 @@ public:
 	sf::Vector2i size;
 
 public:
+	Enemy();
+	~Enemy();
 	void Initialize();	// Called once per Program
 	void Load();		// Called once per Program
 

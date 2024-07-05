@@ -36,27 +36,25 @@ int main()
         sf::Time deltaTimeTimer = clock.restart();
         double deltaTime = deltaTimeTimer.asMicroseconds() / 1000.0;
 
-        //-----------------------------------UPDATE
+        //-----------------------------------UPDATE-------------------------------------------
         sf::Event event;
         while (window.pollEvent(event)) 
         {
             if (event.type == sf::Event::Closed) { window.close(); }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { window.close(); }
         }
+
         frameRate.Update(deltaTime);
         enemy.Update(deltaTime);
         player.Update(deltaTime, enemy);
-
-
-        //-----------------------------------UPDATE
+        //-----------------------------------UPDATE-------------------------------------------
+        
         //-----------------------------------DRAW-------------------------------------------
-
         window.clear(sf::Color::Black);
         enemy.Draw(window);
         player.Draw(window);
         frameRate.Draw(window);
-        window.display();
-
+        window.display()
         //-----------------------------------DRAW-------------------------------------------
     }
 
