@@ -8,10 +8,13 @@ private:
 public:
 	sf::Sprite sprite;
 
+	sf::RectangleShape boundingRectangle;
+	sf::Vector2i size;
+
 public:
 	void Initialize();	// Called once per Program
 	void Load();		// Called once per Program
 
-	void Update();		// Called once per frame
+	void Update(float deltaTime);		// Called once per frame
 	void Draw(sf::RenderWindow& window);		// Called once per frame
 };

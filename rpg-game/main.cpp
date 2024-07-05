@@ -8,7 +8,7 @@ int main()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "RPG Game", sf::Style::Default, settings);
-    //window.setFramerateLimit(60);
+    window.setFramerateLimit(360);
 
     Player player;
     Enemy enemy;
@@ -25,29 +25,27 @@ int main()
 
 
 
+    sf::Clock clock;
 
-    while (window.isOpen()) {
-        //-----------------------------------UPDATE-------------------------------------------
+    while (window.isOpen()) 
+    {
+        sf::Time deltaTimeTimer = clock.restart();
+        float deltaTime = deltaTimeTimer.asMilliseconds();
 
+        //-----------------------------------UPDATE
         sf::Event event;
-        while (window.pollEvent(event))
+        while (window.pollEvent(event)) 
         {
             if (event.type == sf::Event::Closed) { window.close(); }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { window.close(); }
         }
+        enemy.Update(deltaTime);
+        player.Update(deltaTime, enemy);
 
 
-        enemy.Update();
-        player.Update(enemy);
-
-
-        //-----------------------------------UPDATE-------------------------------------------
-
-
-
+        //-----------------------------------UPDATE
         //-----------------------------------DRAW-------------------------------------------
 
-        //render
         window.clear(sf::Color::Black);
         enemy.Draw(window);
         player.Draw(window);
