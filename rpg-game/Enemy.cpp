@@ -60,13 +60,19 @@ void Enemy::Load()
 
 void Enemy::Update(float deltaTime)
 {
-    boundingRectangle.setPosition(sprite.getPosition());
-    healthText.setPosition(sprite.getPosition() + sf::Vector2f(0,0));
+    if (health > 0)
+    {
+        boundingRectangle.setPosition(sprite.getPosition());
+        healthText.setPosition(sprite.getPosition() + sf::Vector2f(0,0));
+    }
 }
 
 void Enemy::Draw(sf::RenderWindow& window)
 {
-    window.draw(sprite);
-    window.draw(boundingRectangle);
-    window.draw(healthText);
+    if (health > 0)
+    {
+        window.draw(sprite);
+        window.draw(boundingRectangle);
+        window.draw(healthText);
+    }
 }

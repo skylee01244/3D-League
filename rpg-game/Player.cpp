@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Math.h"
 
-Player::Player() : bulletSpeed(0.3f), playerSpeed(1.0f), maxFireRate(250), fireRateTimer(0)
+Player::Player() : playerSpeed(1.0f), maxFireRate(150), fireRateTimer(0)
 {
 }
 
@@ -43,7 +43,7 @@ void Player::Load()
     sprite.setPosition(playerPosition);
 }
 
-void Player::Update(float deltaTime, Enemy& enemy)
+void Player::Update(float deltaTime, Enemy& enemy, sf::Vector2f& mousePosition)
 {
     // Movement
     int playerVelocity = 1;
@@ -85,27 +85,30 @@ void Player::Update(float deltaTime, Enemy& enemy)
 
     //----------------------------------------------------------------------------------------------------------
     fireRateTimer += deltaTime;
-    
+
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && fireRateTimer >= maxFireRate)
     {
-        bullets.push_back(sf::RectangleShape(sf::Vector2f(50, 25)));
+        bullets.push_back(Bullet());
         int i = bullets.size() - 1;
-        bullets[i].setPosition(sprite.getPosition());
-
+        bullets[i].Initialize(sprite.getPosition(), mousePosition, 0.5f); // 0.3f is the bullet speed
         fireRateTimer = 0;
     }
 
     for (size_t i = 0; i < bullets.size(); i++)
     {
-        sf::Vector2f bulletdirection = enemy.sprite.getPosition() - bullets[i].getPosition();
-        bulletdirection = Math::NormaliseVector(bulletdirection);
-        bullets[i].setPosition(bullets[i].getPosition() + bulletdirection * bulletSpeed * deltaTime);
+        /*sf::Vector2f bulletDirection = mousePosition - bullets[i].getPosition();
+        bulletDirection = Math::NormaliseVector(bulletDirection);
+        bullets[i].setPosition(bullets[i].getPosition() + bulletDirection * bulletSpeed * deltaTime);*/
 
-        if (Math::DidRectCollide(bullets[i].getGlobalBounds(), enemy.sprite.getGlobalBounds()))
+        bullets[i].Update(deltaTime);
+        if (enemy.health > 0)
         {
-            enemy.ChangeHealth(-10);
-            bullets.erase(bullets.begin() + i);
-            std::cout << "COLLISION" << std::endl;
+            if (Math::DidRectCollide(bullets[i].GetGloabBounds(), enemy.sprite.getGlobalBounds()))
+            {
+                enemy.ChangeHealth(-10);
+                bullets.erase(bullets.begin() + i);
+                std::cout << "COLLISION" << std::endl;
+            }
         }
     }
 
@@ -117,6 +120,6 @@ void Player::Draw(sf::RenderWindow& window)
     window.draw(sprite);
     window.draw(boundingRectangle);
     for (size_t i = 0; i < bullets.size(); i++) {
-        window.draw(bullets[i]);
+        bullets[i].Draw(window);
     }
 }

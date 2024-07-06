@@ -1,14 +1,15 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Enemy.h"
+#include "Bullet.h"
 
 class Player
 {
 private:
 	sf::Texture texture;
 
-	std::vector<sf::RectangleShape> bullets;
-	float bulletSpeed;
+	std::vector<Bullet> bullets;
+
 	float maxFireRate;
 	float fireRateTimer;
 	float playerSpeed;
@@ -21,10 +22,10 @@ public:
 public:
 	Player();
 	~Player();
-	void Initialize();	// Called once per Program
-	void Load();		// Called once per Program
+	void Initialize();
+	void Load();
 
-	void Update(float deltaTime, Enemy& enemy);		// Called once per frame
-	void Draw(sf::RenderWindow& window);		// Called once per frame
+	void Update(float deltaTime, Enemy& enemy, sf::Vector2f& mousePosition);
+	void Draw(sf::RenderWindow& window);
 };
 

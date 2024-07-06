@@ -35,7 +35,7 @@ int main()
     {
         sf::Time deltaTimeTimer = clock.restart();
         double deltaTime = deltaTimeTimer.asMicroseconds() / 1000.0; // You can also just do 1 / seconds
-        double fps = 1.0f / deltaTimeTimer.asSeconds();
+        double fps = 1.0f / deltaTimeTimer.asSeconds(); 
 
         //-----------------------------------UPDATE-------------------------------------------
         sf::Event event;
@@ -45,9 +45,11 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { window.close(); }
         }
 
+        sf::Vector2f mousePosition = sf::Vector2f(sf::Mouse::getPosition(window));
+
         frameRate.Update(deltaTime, fps);
         enemy.Update(deltaTime);
-        player.Update(deltaTime, enemy);
+        player.Update(deltaTime, enemy, mousePosition);
         //-----------------------------------UPDATE-------------------------------------------
         
         //-----------------------------------DRAW-------------------------------------------

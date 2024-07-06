@@ -8,7 +8,6 @@ private:
 	sf::Text healthText;
 	sf::Font font;
 
-	int health;
 
 public:
 	sf::Sprite sprite;
@@ -16,6 +15,7 @@ public:
 	sf::RectangleShape boundingRectangle;
 	sf::Vector2i size;
 
+	int health;
 
 public:
 	Enemy();
