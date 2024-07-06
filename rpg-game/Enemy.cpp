@@ -1,12 +1,18 @@
 #include "Enemy.h"
 #include <iostream>
 
-Enemy::Enemy()
+Enemy::Enemy() : health(100)
 {
 }
 
 Enemy::~Enemy()
 {
+}
+
+void Enemy::ChangeHealth(int hp)
+{
+    health += hp;
+    healthText.setString(std::to_string(health));
 }
 
 void Enemy::Initialize()
@@ -20,6 +26,17 @@ void Enemy::Initialize()
 
 void Enemy::Load()
 {
+    if (font.loadFromFile("Assets/Fonts/arial.ttf"))
+    {
+        std::cout << "Arial.ttf font in Assets has been loaded SUCCESSFULLY" << std::endl;
+        healthText.setFont(font);
+        healthText.setString(std::to_string(health));
+    }
+    else
+    {
+        std::cout << "Failed to load Arial.ttf font in Assets" << std::endl;
+    }
+
     if (texture.loadFromFile("Assets/Enemy/Textures/spritesheet.png"))
     {
         std::cout << "Enemy texture loaded!" << std::endl;
@@ -44,10 +61,12 @@ void Enemy::Load()
 void Enemy::Update(float deltaTime)
 {
     boundingRectangle.setPosition(sprite.getPosition());
+    healthText.setPosition(sprite.getPosition() + sf::Vector2f(0,0));
 }
 
 void Enemy::Draw(sf::RenderWindow& window)
 {
     window.draw(sprite);
     window.draw(boundingRectangle);
+    window.draw(healthText);
 }

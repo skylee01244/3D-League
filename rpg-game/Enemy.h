@@ -5,15 +5,24 @@ class Enemy
 private:
 	sf::Texture texture;
 
+	sf::Text healthText;
+	sf::Font font;
+
+	int health;
+
 public:
 	sf::Sprite sprite;
 
 	sf::RectangleShape boundingRectangle;
 	sf::Vector2i size;
 
+
 public:
 	Enemy();
 	~Enemy();
+
+	void ChangeHealth(int hp);
+	
 	void Initialize();	// Called once per Program
 	void Load();		// Called once per Program
 

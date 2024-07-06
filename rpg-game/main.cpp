@@ -34,7 +34,8 @@ int main()
     while (window.isOpen()) 
     {
         sf::Time deltaTimeTimer = clock.restart();
-        double deltaTime = deltaTimeTimer.asMicroseconds() / 1000.0;
+        double deltaTime = deltaTimeTimer.asMicroseconds() / 1000.0; // You can also just do 1 / seconds
+        double fps = 1.0f / deltaTimeTimer.asSeconds();
 
         //-----------------------------------UPDATE-------------------------------------------
         sf::Event event;
@@ -44,7 +45,7 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { window.close(); }
         }
 
-        frameRate.Update(deltaTime);
+        frameRate.Update(deltaTime, fps);
         enemy.Update(deltaTime);
         player.Update(deltaTime, enemy);
         //-----------------------------------UPDATE-------------------------------------------

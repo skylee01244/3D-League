@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Math.h"
 
-Player::Player() : bulletSpeed(0.3f), playerSpeed(1.0f), maxFireRate(1000), fireRateTimer(0)
+Player::Player() : bulletSpeed(0.3f), playerSpeed(1.0f), maxFireRate(250), fireRateTimer(0)
 {
 }
 
@@ -100,9 +100,11 @@ void Player::Update(float deltaTime, Enemy& enemy)
         sf::Vector2f bulletdirection = enemy.sprite.getPosition() - bullets[i].getPosition();
         bulletdirection = Math::NormaliseVector(bulletdirection);
         bullets[i].setPosition(bullets[i].getPosition() + bulletdirection * bulletSpeed * deltaTime);
-        
+
         if (Math::DidRectCollide(bullets[i].getGlobalBounds(), enemy.sprite.getGlobalBounds()))
         {
+            enemy.ChangeHealth(-10);
+            bullets.erase(bullets.begin() + i);
             std::cout << "COLLISION" << std::endl;
         }
     }
