@@ -8,6 +8,7 @@ int main()
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
+    //sf::RenderWindow window(sf::VideoMode(1920, 1080), "RPG Game", sf::Style::Fullscreen, settings);
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "RPG Game", sf::Style::Default, settings);
     window.setVerticalSyncEnabled(false);
     window.setFramerateLimit(0); // Set to 0 to remove any cap
