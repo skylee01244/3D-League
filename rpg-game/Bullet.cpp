@@ -1,7 +1,7 @@
 #include "Bullet.h"
 #include "Math.h"
 
-Bullet::Bullet() : speed(0)
+Bullet::Bullet() : speed(0.0f)
 {
 }
 
