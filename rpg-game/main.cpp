@@ -49,13 +49,7 @@ int main()
     sf::Clock clock;
 
     while (window.isOpen()) 
-    {
-        sf::Time deltaTimeTimer = clock.restart();
-        double deltaTime = deltaTimeTimer.asMicroseconds() / 1000.0; // You can also just do 1 / seconds
-        double fps = 1.0f / deltaTimeTimer.asSeconds(); 
-        frameRate.Update(deltaTime, fps);
-        frameRate.Draw(window);
-
+	{
 		std::chrono::microseconds delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - previous_time);
 
 		lag += delta_time;
@@ -107,12 +101,10 @@ int main()
 							}
 						}
 					}
-
 					player.draw_map(window);
 
 					enemy.draw_map(window);
 				}
-
 				window.display();
 			}
 		}
