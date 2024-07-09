@@ -6,6 +6,7 @@
 #include "Headers/Enemy.h"
 #include "Headers/Global.h"
 #include "Headers/Player.h"
+#include "Headers/ConvertSketch.h"
 
 int main()
 {
@@ -37,23 +38,11 @@ int main()
 
     map = convert_sketch(player, steven);
 
-    Player player;
-    Player2D player2D;
-    Enemy enemy;
+    map_grid_cell_sprite.setTexture(map_grid_cell_texture);
+    map_grid_cell_sprite.setTextureRect(sf::IntRect(0, 0, MAP_GRID_CELL_SIZE, MAP_GRID_CELL_SIZE));
+    map_wall_sprite.setTexture(map_wall_texture);
 
-    //----------------------------------- INITIALISE -------------------------------------------
-    frameRate.Initialize();
-    player.Initialize();
-    player2D.Initialize();
-    enemy.Initialize();
-    //----------------------------------- INITIALISE -------------------------------------------
-
-    //----------------------------------- LOAD -------------------------------------------
-    frameRate.Load();
-    player.Load();
-    player2D.Load();
-    enemy.Load();
-    //----------------------------------- LOAD -------------------------------------------
+    previous_time = std::chrono::steady_clock::now();
 
     sf::Clock clock;
 

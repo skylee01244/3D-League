@@ -3,11 +3,11 @@
 #include <SFML/Graphics.hpp>
 
 #include "Headers/Global.h"
-#include "Headers/Sky.h"
+#include "Headers/Enemy.h"
 #include "Headers/Player.h"
 #include "Headers/ConvertSketch.h"
 
-std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(Player& i_player, Steven& i_steven)
+std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(Player& i_player, Enemy& i_enemy)
 {
 	std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> output_map{};
 
@@ -30,7 +30,7 @@ std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(Player& i_pla
 			}
 			else if (pixel == sf::Color(0, 0, 255))
 			{
-				i_steven.set_position(static_cast<float>(CELL_SIZE * a), static_cast<float>(CELL_SIZE * b));
+				i_enemy.set_position(static_cast<float>(CELL_SIZE * a), static_cast<float>(CELL_SIZE * b));
 			}
 			else
 			{
