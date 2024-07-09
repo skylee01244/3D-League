@@ -13,11 +13,11 @@ class Player
 	std::array<float, SCREEN_WIDTH> view_rays;
 
 	sf::Sprite map_player_sprite;
-	sf::Sprite steven_sprite;
+	sf::Sprite enemy_sprite;
 	sf::Sprite wall_sprite;
 
 	sf::Texture map_player_texture;
-	sf::Texture steven_texture;
+	sf::Texture enemy_texture;
 	sf::Texture wall_texture;
 public:
 	Player(float i_x, float i_y);

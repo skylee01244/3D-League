@@ -1,6 +1,8 @@
 #include <array>
 #include <chrono>
 #include <SFML/Graphics.hpp>
+#include <algorithm>
+#include <iostream>
 
 #include "Headers/Angles.h"
 #include "Headers/ConvertSketch.h"
@@ -19,10 +21,10 @@ Player::Player(float i_x, float i_y) :
 	wall_sprite(wall_texture)
 {
 	map_player_texture.loadFromFile("Resources/Images/MapPlayer" + std::to_string(MAP_CELL_SIZE) + ".png");
-	steven_texture.loadFromFile("Resources/Images/Steven" + std::to_string(CELL_SIZE) + ".png");
+	enemy_texture.loadFromFile("Resources/Images/Enemy" + std::to_string(CELL_SIZE) + ".png");
 	wall_texture.loadFromFile("Resources/Images/Wall" + std::to_string(CELL_SIZE) + ".png");
 
-	steven_sprite.setTexture(steven_texture);
+	enemy_sprite.setTexture(enemy_texture);
 }
 
 void Player::draw_map(sf::RenderWindow& i_window)
@@ -53,9 +55,9 @@ void Player::draw_map(sf::RenderWindow& i_window)
 	i_window.draw(map_player_sprite);
 }
 
-void Player::draw_screen(sf::RenderWindow& i_window, const Steven& i_steven)
+void Player::draw_screen(sf::RenderWindow& i_window, const Enemy& i_enemy)
 {
-	bool draw_steven = 0;
+	bool draw_enemy = 0;
 
 	//This is the distance when the height of the projection and the height of the wall in front of us are equal.
 	float projection_distance = 0.5f * CELL_SIZE / tan(deg_to_rad(0.5f * FOV_VERTICAL));
@@ -63,12 +65,12 @@ void Player::draw_screen(sf::RenderWindow& i_window, const Steven& i_steven)
 	float floor_level = round(0.5f * SCREEN_HEIGHT * (1 + tan(deg_to_rad(direction_vertical)) / tan(deg_to_rad(0.5f * FOV_VERTICAL))));
 	float ray_start_x = x + 0.5f * CELL_SIZE;
 	float ray_start_y = y + 0.5f * CELL_SIZE;
-	//This is the absolute angle between the player to Steven.
+	//This is the absolute angle between the player to Enemy.
 	//From Wikipedia:
 	//The function atan2 is defined as the angle in the Euclidean plane, given in radians, between the positive x-axis and the ray to the point (x, y) =/= (0, 0).
-	float steven_direction = get_degrees(rad_to_deg(atan2(ray_start_y - i_steven.get_center_y(), i_steven.get_center_x() - ray_start_x))) - direction_horizontal;
+	float enemy_direction = get_degrees(rad_to_deg(atan2(ray_start_y - i_enemy.get_center_y(), i_enemy.get_center_x() - ray_start_x))) - direction_horizontal;
 	//My man Pythagoras is saving the day once again!
-	float steven_distance = static_cast<float>(sqrt(pow(ray_start_x - i_steven.get_center_x(), 2) + pow(ray_start_y - i_steven.get_center_y(), 2)));
+	float enemy_distance = static_cast<float>(sqrt(pow(ray_start_x - i_enemy.get_center_x(), 2) + pow(ray_start_y - i_enemy.get_center_y(), 2)));
 
 	//The column's position can be negative, so SHRT_MIN.
 	short previous_column = SHRT_MIN;
@@ -78,26 +80,25 @@ void Player::draw_screen(sf::RenderWindow& i_window, const Steven& i_steven)
 	floor_shape.setPosition(0, floor_level);
 
 	//This will make sure that the angle stays between -180 and 180.
-	if (-180 >= steven_direction)
+	if (-180 >= enemy_direction)
 	{
-		steven_direction += 360;
+		enemy_direction += 360;
 	}
-	else if (180 < steven_direction)
+	else if (180 < enemy_direction)
 	{
-		steven_direction -= 360;
+		enemy_direction -= 360;
 	}
 
-	//If Steven is FAAAAAAAAR away from us or behind us, we don't need to draw him.
-	draw_steven = RENDER_DISTANCE >= steven_distance && steven_direction <= 0.75f * FOV_HORIZONTAL && steven_direction >= -0.75f * FOV_HORIZONTAL;
+	//If Enemy is FAAAAAAAAR away from us or behind us, we don't need to draw him.
+	draw_enemy = RENDER_DISTANCE >= enemy_distance && enemy_direction <= 0.75f * FOV_HORIZONTAL && enemy_direction >= -0.75f * FOV_HORIZONTAL;
 
 	i_window.draw(floor_shape);
 
 	for (unsigned short a = 0; a < SCREEN_WIDTH; a++)
 	{
-		//My geometry teacher is probably laughing right now: "I TOLD YOU YOU'LL USE THIS IN REAL LIFE!"
 
-		//We're drawing columns that are behind Steven.
-		if (0 == (1 == draw_steven && steven_distance > view_rays[a]))
+		//We're drawing columns that are behind Enemy.
+		if (0 == (1 == draw_enemy && enemy_distance > view_rays[a]))
 		{
 			//When "a" is 0, this'll be +FOV / 2
 			//When "a" is SCREEN_WIDTH / 2, this'll be 0
@@ -165,30 +166,30 @@ void Player::draw_screen(sf::RenderWindow& i_window, const Steven& i_steven)
 		}
 	}
 
-	if (1 == draw_steven)
+	if (1 == draw_enemy)
 	{
-		float frame_angle = 360.f * CELL_SIZE / steven_texture.getSize().x;
-		//We're getting Steven's direction relative to ours.
-		float shifted_direction = get_degrees(i_steven.get_direction() + 0.5f * (180 + frame_angle) - direction_horizontal - steven_direction);
-		float steven_projection_position = 0.5f * tan(deg_to_rad(steven_direction)) / tan(deg_to_rad(0.5f * FOV_HORIZONTAL));
+		float frame_angle = 360.f * CELL_SIZE / enemy_texture.getSize().x;
+		//We're getting Enemy's direction relative to ours.
+		float shifted_direction = get_degrees(i_enemy.get_direction() + 0.5f * (180 + frame_angle) - direction_horizontal - enemy_direction);
+		float enemy_projection_position = 0.5f * tan(deg_to_rad(enemy_direction)) / tan(deg_to_rad(0.5f * FOV_HORIZONTAL));
 
-		short steven_screen_x = static_cast<short>(round(SCREEN_WIDTH * (0.5f - steven_projection_position)));
+		short enemy_screen_x = static_cast<short>(round(SCREEN_WIDTH * (0.5f - enemy_projection_position)));
 
-		unsigned short steven_size = static_cast<unsigned short>(SCREEN_HEIGHT * projection_distance / (steven_distance * cos(deg_to_rad(steven_direction))));
+		unsigned short enemy_size = static_cast<unsigned short>(SCREEN_HEIGHT * projection_distance / (enemy_distance * cos(deg_to_rad(enemy_direction))));
 
 		previous_column = SHRT_MIN;
 
-		steven_sprite.setColor(sf::Color(255, 255, 255, static_cast<unsigned char>(round(255 * std::min<float>(1, 2 * (1 - steven_distance / RENDER_DISTANCE))))));
-		steven_sprite.setPosition(round(steven_screen_x - 0.5f * steven_size), round(floor_level - 0.5f * steven_size));
-		steven_sprite.setScale(steven_size / static_cast<float>(CELL_SIZE), steven_size / static_cast<float>(CELL_SIZE));
-		steven_sprite.setTextureRect(sf::IntRect(static_cast<unsigned short>(CELL_SIZE * floor(shifted_direction / frame_angle)), 0, CELL_SIZE, CELL_SIZE));
+		enemy_sprite.setColor(sf::Color(255, 255, 255, static_cast<unsigned char>(round(255 * std::min<float>(1, 2 * (1 - enemy_distance / RENDER_DISTANCE))))));
+		enemy_sprite.setPosition(round(enemy_screen_x - 0.5f * enemy_size), round(floor_level - 0.5f * enemy_size));
+		enemy_sprite.setScale(enemy_size / static_cast<float>(CELL_SIZE), enemy_size / static_cast<float>(CELL_SIZE));
+		enemy_sprite.setTextureRect(sf::IntRect(static_cast<unsigned short>(CELL_SIZE * floor(shifted_direction / frame_angle)), 0, CELL_SIZE, CELL_SIZE));
 
-		i_window.draw(steven_sprite);
+		i_window.draw(enemy_sprite);
 
 		for (unsigned short a = 0; a < SCREEN_WIDTH; a++)
 		{
-			//We're drawing columns that are closer than Steven.
-			if (steven_distance > view_rays[a])
+			//We're drawing columns that are closer than Enemy.
+			if (enemy_distance > view_rays[a])
 			{
 				float ray_direction = FOV_HORIZONTAL * (floor(0.5f * SCREEN_WIDTH) - a) / (SCREEN_WIDTH - 1);
 				float ray_projection_position = 0.5f * tan(deg_to_rad(ray_direction)) / tan(deg_to_rad(0.5f * FOV_HORIZONTAL));
@@ -248,6 +249,13 @@ void Player::set_position(float i_x, float i_y)
 	y = i_y;
 }
 
+template <typename T>
+T clamp(T value, T min, T max) {
+	if (value < min) return min;
+	if (value > max) return max;
+	return value;
+}
+
 void Player::update(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, const sf::RenderWindow& i_window)
 {
 	float rotation_horizontal = 0;
@@ -259,13 +267,12 @@ void Player::update(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i
 	unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
 
 	//Mouse control!
-	//By the way, do I need to write comments? Can't you just watch my video? I've already explained everything there.
 	rotation_horizontal = FOV_HORIZONTAL * (window_center_x - sf::Mouse::getPosition(i_window).x) / i_window.getSize().x;
 	rotation_vertical = FOV_VERTICAL * (window_center_y - sf::Mouse::getPosition(i_window).y) / i_window.getSize().y;
 
 	direction_horizontal = get_degrees(direction_horizontal + rotation_horizontal);
 	//Putting 90 here breaks the game so I put 89.
-	direction_vertical = std::clamp<float>(direction_vertical + rotation_vertical, -89, 89);
+	direction_vertical = clamp(direction_vertical + rotation_vertical, -89.0f, 89.0f);
 
 	//Just so you know, this works even if the window is out of focus.
 	sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), i_window);
