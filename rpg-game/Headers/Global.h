@@ -7,7 +7,7 @@ constexpr float MOVEMENT_SPEED = 2;
 //Since C++ stores floating numbers differently, this is the closest PI value we can use.
 constexpr float PI = 3.141592653589793116f;
 constexpr float RENDER_DISTANCE = 1024;
-constexpr float STEVEN_ROTATION_SPEED = 2;
+constexpr float ENEMY_ROTATION_SPEED = 2;
 
 //The size of the cell in the game.
 constexpr unsigned char CELL_SIZE = 64;

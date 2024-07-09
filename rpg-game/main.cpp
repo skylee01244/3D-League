@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>    
 #include <iostream>
 
-#include "Headers/FrameRate.h"
 #include "Headers/Angles.h"
 #include "Headers/Enemy.h"
 #include "Headers/Global.h"
@@ -36,7 +35,6 @@ int main()
 
     Player player(0, 0);
     Enemy enemy(0, 0);
-	FrameRate frameRate;
 
     map = convert_sketch(player, enemy);
 

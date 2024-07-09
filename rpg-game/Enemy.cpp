@@ -55,11 +55,11 @@ void Enemy::update(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_
 
 	if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		direction += STEVEN_ROTATION_SPEED;
+		direction += ENEMY_ROTATION_SPEED;
 	}
 	else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		direction -= STEVEN_ROTATION_SPEED;
+		direction -= ENEMY_ROTATION_SPEED;
 	}
 
 	direction = get_degrees(direction);

@@ -7,7 +7,6 @@
 #include "Headers/Angles.h"
 #include "Headers/ConvertSketch.h"
 #include "Headers/Enemy.h"
-#include "Headers/FrameRate.h" // I dont think this is needed
 #include "Headers/Global.h"
 #include "Headers/MapCollision.h"
 #include "Headers/Player.h"

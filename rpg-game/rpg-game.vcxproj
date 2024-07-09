@@ -22,7 +22,6 @@
     <ClCompile Include="Angles.cpp" />
     <ClCompile Include="ConvertSketch.cpp" />
     <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="FrameRate.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MapCollision.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -31,7 +30,6 @@
     <ClInclude Include="Headers\Enemy.h" />
     <ClInclude Include="Headers\ConvertSketch.h" />
     <ClInclude Include="Headers\Angles.h" />
-    <ClInclude Include="Headers\FrameRate.h" />
     <ClInclude Include="Headers\Global.h" />
     <ClInclude Include="Headers\MapCollision.h" />
     <ClInclude Include="Headers\Player.h" />
