@@ -1,18 +1,17 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include "Global.h"
+#include "Headers/Global.h"
 
-class Enemy2D
+class Enemy
 {
 	float direction;
 	float x;
 	float y;
 
-	sf::Sprite map_steven_sprite;
+	sf::Sprite map_enemy_sprite;
 
-	sf::Texture map_steven_texture;
+	sf::Texture map_enemy_texture;
 public:
-	Enemy2D(float i_x, float i_y);
+	Enemy(float i_x, float i_y);
 
 	float get_center_x() const;
 	float get_center_y() const;
