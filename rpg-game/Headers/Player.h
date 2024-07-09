@@ -1,10 +1,8 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 #include <array>
-#include "Global.h"
-#include "Enemy2D.h"
+#include "Enemy.h"
 
-class Player2D
+class Player
 {
 	float direction_horizontal;
 	float direction_vertical;
@@ -22,10 +20,10 @@ class Player2D
 	sf::Texture steven_texture;
 	sf::Texture wall_texture;
 public:
-	Player2D(float i_x, float i_y);
+	Player(float i_x, float i_y);
 
 	void draw_map(sf::RenderWindow& i_window);
-	void draw_screen(sf::RenderWindow& i_window, const Enemy2D& i_steven);
+	void draw_screen(sf::RenderWindow& i_window, const Enemy& i_enemy);
 	void set_position(float i_x, float i_y);
 	void update(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, const sf::RenderWindow& i_window);
 };

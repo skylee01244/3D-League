@@ -1,13 +1,16 @@
 #include <array>
 #include <chrono>
-#include <iostream>
 #include <SFML/Graphics.hpp>
 
-#include "Global.h"
-#include "Angles.h"
-#include "Player2D.h"
+#include "Headers/Angles.h"
+#include "Headers/ConvertSketch.h"
+#include "Headers/Enemy.h"
+#include "Headers/FrameRate.h" // I dont think this is needed
+#include "Headers/Global.h"
+#include "Headers/MapCollision.h"
+#include "Headers/Player.h"
 
-Player2D::Player2D(float i_x, float i_y) :
+Player::Player(float i_x, float i_y) :
 	direction_horizontal(0),
 	direction_vertical(0),
 	x(i_x),
@@ -22,7 +25,7 @@ Player2D::Player2D(float i_x, float i_y) :
 	steven_sprite.setTexture(steven_texture);
 }
 
-void Player2D::draw_map(sf::RenderWindow& i_window)
+void Player::draw_map(sf::RenderWindow& i_window)
 {
 	//If we have 8 frames, each frame will represent 45 degrees.
 	float frame_angle = 360.f * MAP_CELL_SIZE / map_player_texture.getSize().x;
@@ -50,7 +53,7 @@ void Player2D::draw_map(sf::RenderWindow& i_window)
 	i_window.draw(map_player_sprite);
 }
 
-void Player2D::draw_screen(sf::RenderWindow& i_window, const Enemy2D& enemy2D)
+void Player::draw_screen(sf::RenderWindow& i_window, const Steven& i_steven)
 {
 	bool draw_steven = 0;
 
@@ -63,9 +66,9 @@ void Player2D::draw_screen(sf::RenderWindow& i_window, const Enemy2D& enemy2D)
 	//This is the absolute angle between the player to Steven.
 	//From Wikipedia:
 	//The function atan2 is defined as the angle in the Euclidean plane, given in radians, between the positive x-axis and the ray to the point (x, y) =/= (0, 0).
-	float steven_direction = get_degrees(rad_to_deg(atan2(ray_start_y - enemy2D.get_center_y(), enemy2D.get_center_x() - ray_start_x))) - direction_horizontal;
+	float steven_direction = get_degrees(rad_to_deg(atan2(ray_start_y - i_steven.get_center_y(), i_steven.get_center_x() - ray_start_x))) - direction_horizontal;
 	//My man Pythagoras is saving the day once again!
-	float steven_distance = static_cast<float>(sqrt(pow(ray_start_x - enemy2D.get_center_x(), 2) + pow(ray_start_y - enemy2D.get_center_y(), 2)));
+	float steven_distance = static_cast<float>(sqrt(pow(ray_start_x - i_steven.get_center_x(), 2) + pow(ray_start_y - i_steven.get_center_y(), 2)));
 
 	//The column's position can be negative, so SHRT_MIN.
 	short previous_column = SHRT_MIN;
@@ -166,7 +169,7 @@ void Player2D::draw_screen(sf::RenderWindow& i_window, const Enemy2D& enemy2D)
 	{
 		float frame_angle = 360.f * CELL_SIZE / steven_texture.getSize().x;
 		//We're getting Steven's direction relative to ours.
-		float shifted_direction = get_degrees(enemy2D.get_direction() + 0.5f * (180 + frame_angle) - direction_horizontal - steven_direction);
+		float shifted_direction = get_degrees(i_steven.get_direction() + 0.5f * (180 + frame_angle) - direction_horizontal - steven_direction);
 		float steven_projection_position = 0.5f * tan(deg_to_rad(steven_direction)) / tan(deg_to_rad(0.5f * FOV_HORIZONTAL));
 
 		short steven_screen_x = static_cast<short>(round(SCREEN_WIDTH * (0.5f - steven_projection_position)));
@@ -239,13 +242,13 @@ void Player2D::draw_screen(sf::RenderWindow& i_window, const Enemy2D& enemy2D)
 	}
 }
 
-void Player2D::set_position(float i_x, float i_y)
+void Player::set_position(float i_x, float i_y)
 {
 	x = i_x;
 	y = i_y;
 }
 
-void Player2D::update(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, const sf::RenderWindow& i_window)
+void Player::update(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, const sf::RenderWindow& i_window)
 {
 	float rotation_horizontal = 0;
 	float rotation_vertical = 0;
