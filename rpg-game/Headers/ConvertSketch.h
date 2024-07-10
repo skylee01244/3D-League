@@ -1,6 +1,4 @@
 #pragma once
-#include "Headers/Global.h"
-#include "Player.h"
-#include "Enemy.h"
+#include <vector>
 
-std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(Player& i_player, Enemy& i_enemy);
+gbl::MAP::Map<> convert_map_sketch(std::vector<Decoration>& i_decorations, Player& i_player, StevenIzDaBest& i_steven, SpriteManager& i_sprite_manager);

@@ -1,40 +1,68 @@
 #include <array>
 #include <chrono>
+#include <unordered_map>
 #include <SFML/Graphics.hpp>
 
 #include "Headers/Global.h"
-#include "Headers/Enemy.h"
+#include "Headers/SpriteManager.h"
+#include "Headers/Animation.h"
+#include "Headers/Decoration.h"
 #include "Headers/Player.h"
-#include "Headers/ConvertSketch.h"
+#include "Headers/Enemy.h"
 
-std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(Player& i_player, Enemy& i_enemy)
+
+gbl::MAP::Map<> convert_map_sketch(std::vector<Decoration>& i_decorations, Player& i_player, StevenIzDaBest& i_steven, SpriteManager& i_sprite_manager)
 {
-	std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> output_map{};
-
 	sf::Image map_sketch;
-	map_sketch.loadFromFile("Resources/Images/MapSketch.png");
+	map_sketch.loadFromFile("Resources/Images/Maps/MapSketch.png");
 
-	for (unsigned char a = 0; a < MAP_WIDTH; a++)
+	gbl::MAP::Map output_map{};
+
+	for (unsigned char a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
-		for (unsigned char b = 0; b < MAP_HEIGHT; b++)
+		for (unsigned char b = 0; b < gbl::MAP::ROWS; b++)
 		{
 			sf::Color pixel = map_sketch.getPixel(a, b);
 
 			if (pixel == sf::Color(0, 0, 0))
 			{
-				output_map[a][b] = Cell::Wall;
+				output_map[a][b] = gbl::MAP::Cell::Wall;
 			}
-			else if (pixel == sf::Color(255, 0, 0))
+			else if (pixel == sf::Color(0, 0, 170))
 			{
-				i_player.set_position(static_cast<float>(CELL_SIZE * a), static_cast<float>(CELL_SIZE * b));
+				output_map[a][b] = gbl::MAP::Cell::MugWall;
 			}
 			else if (pixel == sf::Color(0, 0, 255))
 			{
-				i_enemy.set_position(static_cast<float>(CELL_SIZE * a), static_cast<float>(CELL_SIZE * b));
+				i_steven.set_position(a, b);
+			}
+			else if (pixel == sf::Color(109, 0, 0))
+			{
+				output_map[a][b] = gbl::MAP::Cell::TextWall;
+			}
+			else if (pixel == sf::Color(182, 0, 0))
+			{
+				i_decorations.push_back(Decoration(0, "BARREL", i_sprite_manager, a, b));
+			}
+			else if (pixel == sf::Color(255, 0, 0))
+			{
+				i_player.set_position(a, b);
+			}
+			else if (pixel == sf::Color(255, 146, 0))
+			{
+				i_decorations.push_back(Decoration(1, "FIRE_CAULDRON", i_sprite_manager, a, b));
+			}
+			else if (pixel == sf::Color(73, 73, 85))
+			{
+				output_map[a][b] = gbl::MAP::Cell::SkeletonWall;
+			}
+			else if (pixel == sf::Color(146, 146, 170))
+			{
+				output_map[a][b] = gbl::MAP::Cell::HelpWall;
 			}
 			else
 			{
-				output_map[a][b] = Cell::Empty;
+				output_map[a][b] = gbl::MAP::Cell::Empty;
 			}
 		}
 	}
