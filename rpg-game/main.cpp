@@ -74,7 +74,7 @@ int main()
 
 			if (FRAME_DURATION > lag)
 			{
-				window.clear(sf::Color(73, 255, 255));		// Colour the sky
+				window.clear(sf::Color(0, 26, 77));		// Colour the sky
 
 				player.draw_screen(window, enemy);
 

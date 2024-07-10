@@ -21,7 +21,7 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Angles.cpp">
+    <ClCompile Include="AngleFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ConvertSketch.cpp">
@@ -33,6 +33,9 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Global.h">
@@ -41,7 +44,7 @@
     <ClInclude Include="Headers\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\Angles.h">
+    <ClInclude Include="Headers\AngleFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\ConvertSketch.h">
@@ -51,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\Enemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
