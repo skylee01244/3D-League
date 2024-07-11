@@ -1,14 +1,11 @@
 #include <array>
 #include <chrono>
+#include <SFML/Graphics.hpp>
 
 #include "Headers/Global.h"
-#include "Headers/MapCollision.h"
 
-bool map_collision(float i_x, float i_y, const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map)
+bool map_collision(const float i_x, const float i_y, const gbl::MAP::Map<>& i_map)
 {
-	float cell_x = i_x / CELL_SIZE;
-	float cell_y = i_y / CELL_SIZE;
-
 	for (unsigned char a = 0; a < 4; a++)
 	{
 		short x = 0;
@@ -18,35 +15,35 @@ bool map_collision(float i_x, float i_y, const std::array<std::array<Cell, MAP_H
 		{
 		case 0:
 		{
-			x = static_cast<short>(floor(cell_x));
-			y = static_cast<short>(floor(cell_y));
+			x = static_cast<short>(floor(i_x));
+			y = static_cast<short>(floor(i_y));
 
 			break;
 		}
 		case 1:
 		{
-			x = static_cast<short>(ceil(cell_x));
-			y = static_cast<short>(floor(cell_y));
+			x = static_cast<short>(ceil(i_x));
+			y = static_cast<short>(floor(i_y));
 
 			break;
 		}
 		case 2:
 		{
-			x = static_cast<short>(floor(cell_x));
-			y = static_cast<short>(ceil(cell_y));
+			x = static_cast<short>(floor(i_x));
+			y = static_cast<short>(ceil(i_y));
 
 			break;
 		}
 		case 3:
 		{
-			x = static_cast<short>(ceil(cell_x));
-			y = static_cast<short>(ceil(cell_y));
+			x = static_cast<short>(ceil(i_x));
+			y = static_cast<short>(ceil(i_y));
 		}
 		}
 
-		if (0 <= x && 0 <= y && MAP_HEIGHT > y && MAP_WIDTH > x)
+		if (0 <= x && 0 <= y && gbl::MAP::COLUMNS > x && gbl::MAP::ROWS > y)
 		{
-			if (Cell::Wall == i_map[x][y])
+			if (gbl::MAP::Cell::Empty != i_map[x][y])
 			{
 				return 1;
 			}

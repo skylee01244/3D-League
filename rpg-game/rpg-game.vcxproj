@@ -20,21 +20,35 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AngleFunctions.cpp" />
-    <ClCompile Include="ConvertSketch.cpp" />
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Astar.cpp" />
+    <ClCompile Include="ConvertMapSketch.cpp" />
+    <ClCompile Include="Decoration.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GetAdjacentCells.cpp" />
+    <ClCompile Include="GetCell.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MapCollision.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="Stripe.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Headers\Animation.h" />
+    <ClInclude Include="Headers\GetCell.h" />
+    <ClInclude Include="Headers\GetAdjacentCells.h" />
+    <ClInclude Include="Headers\Decoration.h" />
+    <ClInclude Include="Headers\Astar.h" />
     <ClInclude Include="Headers\Game.h" />
     <ClInclude Include="Headers\Enemy.h" />
-    <ClInclude Include="Headers\ConvertSketch.h" />
+    <ClInclude Include="Headers\ConvertMapSketch.h" />
     <ClInclude Include="Headers\AngleFunctions.h" />
     <ClInclude Include="Headers\Global.h" />
     <ClInclude Include="Headers\MapCollision.h" />
     <ClInclude Include="Headers\Player.h" />
+    <ClInclude Include="Headers\SpriteManager.h" />
+    <ClInclude Include="Headers\Stripe.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -130,6 +144,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

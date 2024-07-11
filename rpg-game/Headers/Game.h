@@ -1,6 +1,10 @@
 #pragma once
 #include <vector>
 #include <array>
+#include "Stripe.h"
+#include "Decoration.h"
+#include "Animation.h"
+#include "Player.h"
 
 class Game
 {
@@ -12,7 +16,7 @@ class Game
 
 	std::vector<Decoration> decorations;
 
-	sf::Event event;
+	sf::Event event = sf::Event();
 
 	sf::RenderWindow window;
 
@@ -27,6 +31,7 @@ class Game
 	StevenIzDaBest steven;
 
 	gbl::MAP::Map<> map;
+
 public:
 	Game();
 

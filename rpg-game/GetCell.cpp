@@ -1,6 +1,6 @@
 #include <array>
 #include <chrono>
-#include <SFML/Graphics.h>
+#include <SFML/Graphics.hpp>
 
 #include "Headers/Global.h"
 

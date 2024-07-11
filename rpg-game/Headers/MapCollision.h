@@ -1,3 +1,3 @@
 #pragma once
 
-bool map_collision(float i_x, float i_y, const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
+bool map_collision(const float i_x, const float i_y, const gbl::MAP::Map<>& i_map);

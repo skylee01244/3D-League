@@ -4,11 +4,12 @@
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
 
-#include "Headers/Angles.h"
+#include "Headers/AngleFunctions.h"
 #include "Headers/Enemy.h"
 #include "Headers/Global.h"
+#include "Headers/Game.h"
 #include "Headers/Player.h"
-#include "Headers/ConvertSketch.h"
+#include "Headers/ConvertMapSketch.h"
 
 int main()
 {
