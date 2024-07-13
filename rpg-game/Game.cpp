@@ -108,8 +108,8 @@ void Game::draw()
 		{
 			float floor_step_x;
 			float floor_step_y;
-			float floor_x;
-			float floor_y;
+			double floor_x;
+			double floor_y;
 			float row_distance;
 
 			//We're drawing the floor row by row from top to bottom.
@@ -287,12 +287,10 @@ void Game::handle_events()
 		{
 			switch (event.key.code)
 			{
-			case sf::Keyboard::M:
-			{
-				//I hate using boolean operators but if you like them, uncomment the next line.
-				//show_map = !show_map;
-				show_map = 1 - show_map;
-			}
+				case sf::Keyboard::M:
+				{
+					show_map = 1 - show_map;
+				}
 			}
 		}
 		}

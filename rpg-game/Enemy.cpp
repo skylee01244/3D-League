@@ -26,7 +26,6 @@ StevenIzDaBest::StevenIzDaBest(SpriteManager& i_sprite_manager, float i_x, float
 	astar_g_scores({}),
 	astar_h_scores({})
 {
-
 }
 
 bool StevenIzDaBest::get_screamer() const

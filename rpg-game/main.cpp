@@ -27,19 +27,6 @@ int main()
 
 	game.draw();
 
-    //sf::ContextSettings settings;
-    //settings.antialiasingLevel = 8;
-    //sf::RenderWindow window(sf::VideoMode(SCREEN_RESIZE * SCREEN_WIDTH, SCREEN_RESIZE * SCREEN_HEIGHT), "2D game", sf::Style::Default);
-    //window.setMouseCursorVisible(100);  // 0 to hide Cursor
-    //window.setView(sf::View(sf::FloatRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)));
-
-	/*while (1 == window.pollEvent(event))
-	{
-		if (event.type == sf::Event::Closed) { window.close(); }
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) { window.close(); }
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::H)) { draw_map = 1 - draw_map; }
-	}*/
-
 	while (game.is_open())
 	{
 		std::chrono::microseconds delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - previous_time);
