@@ -118,7 +118,6 @@ void astar_search(unsigned short& i_path_length, std::map<gbl::Position<>, gbl::
 
 				if (abs(adjacent_cell.x - min_f_cell.x) == abs(adjacent_cell.y - min_f_cell.y))
 				{
-					//If the adjacent cell is located diagonally, we add the square root of 2.
 					g_score += sqrt(2);
 				}
 				else
@@ -178,13 +177,6 @@ std::vector<sf::Vector2<unsigned short>> get_adjacent_cells(const sf::Vector2<un
 			}
 		}
 	}
-
-	//I just realized that we don't need to put diagonal adjacent cells separately since we're not using the BFS algorithm.
-	//I wish I could fix it but I don't want to.
-	//...
-	//Why don't you fix it instead, huh?
-	//Yeah, this will be your homework.
-	//I'm your teacher now.
 	adjacent_cells.insert(adjacent_cells.end(), diagonal_adjacent_cells.begin(), diagonal_adjacent_cells.end());
 
 	return adjacent_cells;
