@@ -21,7 +21,7 @@ int main()
 
 	std::string fps_text = "FPS: 60"; // This should be 30 as it is currently set to 30 (NEED TO CHANGE TO 60)
 
-	Game game;
+	Game game;	// main game logic
 
 	previous_time = std::chrono::steady_clock::now();
 
