@@ -26,7 +26,6 @@
     <ClCompile Include="Decoration.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GetAdjacentCells.cpp" />
     <ClCompile Include="GetCell.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MapCollision.cpp" />
@@ -37,7 +36,6 @@
   <ItemGroup>
     <ClInclude Include="Headers\Animation.h" />
     <ClInclude Include="Headers\GetCell.h" />
-    <ClInclude Include="Headers\GetAdjacentCells.h" />
     <ClInclude Include="Headers\Decoration.h" />
     <ClInclude Include="Headers\Astar.h" />
     <ClInclude Include="Headers\Game.h" />
