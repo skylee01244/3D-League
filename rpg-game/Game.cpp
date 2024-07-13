@@ -19,7 +19,6 @@ Game::Game() :
 	hand_offset(-0.5f),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Close),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
-	hand_animation("HAND", sprite_manager, 0, gbl::SPRITES::FIRE_ANIMATION_SPEED),
 	steven(sprite_manager)
 {
 	window.setMouseCursorVisible(0);
@@ -217,8 +216,6 @@ void Game::draw()
 		{
 			draw_map();
 		}
-
-		hand_animation.draw(sf::Vector2<short>(gbl::SCREEN::WIDTH + hand_offset_x - hand_texture_width, gbl::SCREEN::HEIGHT + hand_offset_y - hand_texture_height), window, 0, 0, gbl::SPRITES::HAND_SCALE, gbl::SPRITES::HAND_SCALE);
 
 		window.display();
 	}
@@ -541,63 +538,6 @@ void Game::update()
 		for (Decoration& decoration : decorations)
 		{
 			decoration.update(player.get_direction(), player.get_position());
-		}
-
-		hand_animation.update();
-
-		//So this is what they mean when they say "Drawing hands is hard".
-		if (0 < player_movement_distance)
-		{
-			hand_offset += gbl::SPRITES::HAND_BOBBING_SPEED * player_movement_distance / gbl::PLAYER::MOVEMENT_SPEED;
-
-			while (1 <= hand_offset)
-			{
-				hand_offset -= 2;
-			}
-		}
-		else
-		{
-			if (-0.5f > hand_offset)
-			{
-				hand_offset += gbl::SPRITES::HAND_BOBBING_SPEED;
-
-				if (-0.5f < hand_offset)
-				{
-					hand_offset = -0.5f;
-				}
-			}
-			else if (-0.5f < hand_offset && 0.5f > hand_offset)
-			{
-				if (0 > hand_offset)
-				{
-					hand_offset -= gbl::SPRITES::HAND_BOBBING_SPEED;
-
-					if (-0.5f > hand_offset)
-					{
-						hand_offset = -0.5f;
-					}
-				}
-				else
-				{
-					hand_offset += gbl::SPRITES::HAND_BOBBING_SPEED;
-
-					if (0.5f < hand_offset)
-					{
-						hand_offset = 0.5f;
-					}
-				}
-			}
-			else if (0.5f < hand_offset)
-			{
-				hand_offset -= gbl::SPRITES::HAND_BOBBING_SPEED;
-
-				if (0.5f > hand_offset)
-				{
-					hand_offset = 0.5f;
-				}
-			}
-
-			hand_offset = -abs(hand_offset);
 		}
 	}
 }

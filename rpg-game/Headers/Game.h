@@ -24,8 +24,6 @@ class Game
 
 	SpriteManager sprite_manager;
 
-	Animation hand_animation;
-
 	Player player;
 
 	StevenIzDaBest steven;
