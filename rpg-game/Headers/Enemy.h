@@ -1,7 +1,7 @@
 #pragma once
 #include "SpriteManager.h"
 
-class StevenIzDaBest
+class Enemy
 {
 	bool in_the_view;
 	bool screamer;
@@ -33,7 +33,7 @@ class StevenIzDaBest
 	gbl::MAP::Map<float> astar_h_scores;
 	//----------------< A star algorithm end >----------------
 public:
-	StevenIzDaBest(SpriteManager& i_sprite_manager, const float i_x = 0, const float i_y = 0);
+	Enemy(SpriteManager& i_sprite_manager, const float i_x = 0, const float i_y = 0);
 
 	bool get_screamer() const;
 

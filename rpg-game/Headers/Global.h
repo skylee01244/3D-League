@@ -82,7 +82,7 @@ namespace gbl
 		constexpr unsigned short HAND_OFFSET_MAX = 64;
 	}
 
-	namespace STEVEN
+	namespace ENEMY
 	{
 		constexpr float MAX_MOVEMENT_DISTANCE = 32;
 		constexpr float MAX_MOVEMENT_SPEED = 0.25f;

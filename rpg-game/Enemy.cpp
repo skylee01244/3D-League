@@ -10,7 +10,7 @@
 #include "Headers/MapCollision.h"
 #include "Headers/Enemy.h"
 
-StevenIzDaBest::StevenIzDaBest(SpriteManager& i_sprite_manager, float i_x, float i_y) :
+Enemy::Enemy(SpriteManager& i_sprite_manager, float i_x, float i_y) :
 	in_the_view(0),
 	screamer(0),
 	direction(0),
@@ -28,27 +28,27 @@ StevenIzDaBest::StevenIzDaBest(SpriteManager& i_sprite_manager, float i_x, float
 {
 }
 
-bool StevenIzDaBest::get_screamer() const
+bool Enemy::get_screamer() const
 {
 	return screamer;
 }
 
-float StevenIzDaBest::get_direction() const
+float Enemy::get_direction() const
 {
 	return direction;
 }
 
-float StevenIzDaBest::get_distance() const
+float Enemy::get_distance() const
 {
 	return distance;
 }
 
-int StevenIzDaBest::get_height() const
+int Enemy::get_height() const
 {
 	return round(gbl::SCREEN::HEIGHT / (distance * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL))));
 }
 
-int StevenIzDaBest::get_width() const
+int Enemy::get_width() const
 {
 	float sprite_height = sprite_manager->get_sprite_data("STEVEN").texture_box.height;
 	float sprite_width = sprite_manager->get_sprite_data("STEVEN").texture_box.width;
@@ -56,17 +56,17 @@ int StevenIzDaBest::get_width() const
 	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 }
 
-int StevenIzDaBest::get_x() const
+int Enemy::get_x() const
 {
 	return screen_x - round(0.5f * get_width());
 }
 
-int StevenIzDaBest::get_y() const
+int Enemy::get_y() const
 {
 	return round(0.5f * (gbl::SCREEN::HEIGHT - get_height()));
 }
 
-void StevenIzDaBest::draw(const short i_pitch, sf::RenderWindow& i_window)
+void Enemy::draw(const short i_pitch, sf::RenderWindow& i_window)
 {
 	float sprite_height = sprite_manager->get_sprite_data("STEVEN").texture_box.height;
 	float sprite_width = sprite_manager->get_sprite_data("STEVEN").texture_box.width;
@@ -81,7 +81,7 @@ void StevenIzDaBest::draw(const short i_pitch, sf::RenderWindow& i_window)
 	}
 }
 
-void StevenIzDaBest::fill_map(const gbl::MAP::Map<>& i_map)
+void Enemy::fill_map(const gbl::MAP::Map<>& i_map)
 {
 	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
@@ -99,7 +99,7 @@ void StevenIzDaBest::fill_map(const gbl::MAP::Map<>& i_map)
 	}
 }
 
-void StevenIzDaBest::set_position(const float i_x, const float i_y)
+void Enemy::set_position(const float i_x, const float i_y)
 {
 	position.x = i_x;
 	position.y = i_y;
@@ -108,7 +108,7 @@ void StevenIzDaBest::set_position(const float i_x, const float i_y)
 	next_cell.y = position.y;
 }
 
-void StevenIzDaBest::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player_direction, const sf::Vector2f& i_player_position, const gbl::MAP::Map<>& i_map)
+void Enemy::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player_direction, const sf::Vector2f& i_player_position, const gbl::MAP::Map<>& i_map)
 {
 	if (1 == i_window.hasFocus())
 	{
@@ -132,17 +132,17 @@ void StevenIzDaBest::update(const sf::RenderWindow& i_window, const sf::Vector2f
 			direction = rad_to_deg(atan2(position.y - next_cell.y, next_cell.x - position.x));
 
 			//The farther Steven is from the player, the faster he moves, and vice versa.
-			if (gbl::STEVEN::MAX_MOVEMENT_DISTANCE < astar_path_length)
+			if (gbl::ENEMY::MAX_MOVEMENT_DISTANCE < astar_path_length)
 			{
-				speed = gbl::STEVEN::MAX_MOVEMENT_SPEED;
+				speed = gbl::ENEMY::MAX_MOVEMENT_SPEED;
 			}
-			else if (gbl::STEVEN::MIN_MOVEMENT_DISTANCE > astar_path_length)
+			else if (gbl::ENEMY::MIN_MOVEMENT_DISTANCE > astar_path_length)
 			{
-				speed = gbl::STEVEN::MIN_MOVEMENT_SPEED;
+				speed = gbl::ENEMY::MIN_MOVEMENT_SPEED;
 			}
 			else
 			{
-				speed = gbl::STEVEN::MIN_MOVEMENT_SPEED + (gbl::STEVEN::MAX_MOVEMENT_SPEED - gbl::STEVEN::MIN_MOVEMENT_SPEED) * (astar_path_length - gbl::STEVEN::MIN_MOVEMENT_DISTANCE) / (gbl::STEVEN::MAX_MOVEMENT_DISTANCE - gbl::STEVEN::MIN_MOVEMENT_DISTANCE);
+				speed = gbl::ENEMY::MIN_MOVEMENT_SPEED + (gbl::ENEMY::MAX_MOVEMENT_SPEED - gbl::ENEMY::MIN_MOVEMENT_SPEED) * (astar_path_length - gbl::ENEMY::MIN_MOVEMENT_DISTANCE) / (gbl::ENEMY::MAX_MOVEMENT_DISTANCE - gbl::ENEMY::MIN_MOVEMENT_DISTANCE);
 			}
 		}
 
@@ -210,7 +210,7 @@ void StevenIzDaBest::update(const sf::RenderWindow& i_window, const sf::Vector2f
 	}
 }
 
-sf::Vector2f StevenIzDaBest::get_position() const
+sf::Vector2f Enemy::get_position() const
 {
 	return position;
 }

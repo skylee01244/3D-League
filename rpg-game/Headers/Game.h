@@ -26,7 +26,7 @@ class Game
 
 	Player player;
 
-	StevenIzDaBest steven;
+	Enemy enemy;
 
 	gbl::MAP::Map<> map;
 

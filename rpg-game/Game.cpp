@@ -19,14 +19,14 @@ Game::Game() :
 	hand_offset(-0.5f),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Close),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
-	steven(sprite_manager)
+	enemy(sprite_manager)
 {
 	window.setMouseCursorVisible(0);
 	window.setView(sf::View(sf::FloatRect(0, 0, gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT)));
 
-	map = convert_map_sketch(decorations, player, steven, sprite_manager);
+	map = convert_map_sketch(decorations, player, enemy, sprite_manager);
 
-	steven.fill_map(map);
+	enemy.fill_map(map);
 
 	for (Stripe& stripe : stripes)
 	{
@@ -54,7 +54,7 @@ void Game::calculate_fov_visualization()
 
 void Game::draw()
 {
-	if (0 == steven.get_screamer())
+	if (0 == enemy.get_screamer())
 	{
 		bool steven_is_drawn = 0;
 
@@ -166,11 +166,11 @@ void Game::draw()
 				//2) Writing the same code 3 times and tolerating people making fun of me.
 				if (0 == steven_is_drawn)
 				{
-					if (steven.get_distance() > decorations[decoration_index].get_distance())
+					if (enemy.get_distance() > decorations[decoration_index].get_distance())
 					{
 						steven_is_drawn = 1;
 
-						steven.draw(pitch, window);
+						enemy.draw(pitch, window);
 					}
 				}
 
@@ -181,11 +181,11 @@ void Game::draw()
 
 			if (0 == steven_is_drawn)
 			{
-				if (steven.get_distance() > stripe.get_distance())
+				if (enemy.get_distance() > stripe.get_distance())
 				{
 					steven_is_drawn = 1;
 
-					steven.draw(pitch, window);
+					enemy.draw(pitch, window);
 				}
 			}
 
@@ -196,11 +196,11 @@ void Game::draw()
 		{
 			if (0 == steven_is_drawn)
 			{
-				if (steven.get_distance() > decorations[a].get_distance())
+				if (enemy.get_distance() > decorations[a].get_distance())
 				{
 					steven_is_drawn = 1;
 
-					steven.draw(pitch, window);
+					enemy.draw(pitch, window);
 				}
 			}
 
@@ -209,7 +209,7 @@ void Game::draw()
 
 		if (0 == steven_is_drawn)
 		{
-			steven.draw(pitch, window);
+			enemy.draw(pitch, window);
 		}
 
 		if (1 == show_map)
@@ -221,16 +221,16 @@ void Game::draw()
 	}
 	else
 	{
-		short screamer_x = 0.5f * (gbl::SCREEN::WIDTH - gbl::STEVEN::SCREAMER_RESIZE * sprite_manager.get_sprite_data("STEVEN_SCREAMER").texture_box.width);
-		short screamer_y = gbl::STEVEN::SCREAMER_Y;
+		short screamer_x = 0.5f * (gbl::SCREEN::WIDTH - gbl::ENEMY::SCREAMER_RESIZE * sprite_manager.get_sprite_data("STEVEN_SCREAMER").texture_box.width);
+		short screamer_y = gbl::ENEMY::SCREAMER_Y;
 
 		//By the end of the project I became so lazy I didn't wanna bother working with the random library so I used rand().
-		screamer_x += rand() % (1 + 2 * gbl::STEVEN::SCREAMER_MAX_OFFSET) - gbl::STEVEN::SCREAMER_MAX_OFFSET;
-		screamer_y += rand() % (1 + 2 * gbl::STEVEN::SCREAMER_MAX_OFFSET) - gbl::STEVEN::SCREAMER_MAX_OFFSET;
+		screamer_x += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
+		screamer_y += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
 
 		window.clear();
 
-		sprite_manager.draw_sprite(0, "STEVEN_SCREAMER", sf::Vector2<short>(screamer_x, screamer_y), window, 0, 0, gbl::STEVEN::SCREAMER_RESIZE, gbl::STEVEN::SCREAMER_RESIZE);
+		sprite_manager.draw_sprite(0, "STEVEN_SCREAMER", sf::Vector2<short>(screamer_x, screamer_y), window, 0, 0, gbl::ENEMY::SCREAMER_RESIZE, gbl::ENEMY::SCREAMER_RESIZE);
 
 		window.display();
 	}
@@ -240,7 +240,7 @@ void Game::draw_map()
 {
 	float frame_angle = 360.f / sprite_manager.get_sprite_data("MAP_PLAYER").total_frames;
 	float shifted_direction = get_degrees(player.get_direction().x + 0.5f * frame_angle);
-	float steven_shifted_direction = get_degrees(steven.get_direction() + 0.5f * frame_angle);
+	float enemy_shifted_direction = get_degrees(enemy.get_direction() + 0.5f * frame_angle);
 
 	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
@@ -264,7 +264,7 @@ void Game::draw_map()
 
 	window.draw(fov_visualization);
 
-	sprite_manager.draw_sprite(floor(steven_shifted_direction / frame_angle), "MAP_STEVEN", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * steven.get_position().x), round(gbl::MAP::CELL_SIZE * steven.get_position().y)), window);
+	sprite_manager.draw_sprite(floor(enemy_shifted_direction / frame_angle), "MAP_STEVEN", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * enemy.get_position().x), round(gbl::MAP::CELL_SIZE * enemy.get_position().y)), window);
 	sprite_manager.draw_sprite(floor(shifted_direction / frame_angle), "MAP_PLAYER", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * player.get_position().x), round(gbl::MAP::CELL_SIZE * player.get_position().y)), window);
 }
 
@@ -521,7 +521,7 @@ void Game::set_title(const std::string& i_title)
 
 void Game::update()
 {
-	if (0 == steven.get_screamer())
+	if (0 == enemy.get_screamer())
 	{
 		float player_movement_distance;
 
@@ -529,7 +529,7 @@ void Game::update()
 
 		player.update(window, map);
 
-		steven.update(window, player.get_direction(), player.get_position(), map);
+		enemy.update(window, player.get_direction(), player.get_position(), map);
 
 		player_movement_distance = sqrt(pow(player_position.x - player.get_position().x, 2) + pow(player_position.y - player.get_position().y, 2));
 
