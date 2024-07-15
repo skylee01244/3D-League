@@ -78,6 +78,7 @@ namespace gbl
 		constexpr float FIRE_ANIMATION_SPEED = 0.5f;
 	}
 
+
 	namespace ENEMY
 	{
 		constexpr float MAX_MOVEMENT_DISTANCE = 32;
