@@ -16,7 +16,6 @@
 
 Game::Game() :
 	show_map(1),
-	hand_offset(-0.5f),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Close),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy(sprite_manager)
@@ -62,8 +61,6 @@ void Game::draw()
 		//You can use that if you wanna add jumping or crouching.
 		float camera_z = 0.5f * gbl::SCREEN::HEIGHT;
 		float end_stripe_x = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
-		float hand_offset_x = gbl::SPRITES::HAND_OFFSET_MAX * cos(gbl::RAYCASTING::PI * hand_offset);
-		float hand_offset_y = 0.5f * gbl::SPRITES::HAND_OFFSET_MAX * sin(gbl::RAYCASTING::PI * abs(hand_offset));
 		float ray_direction_end_x;
 		float ray_direction_end_y;
 		float ray_direction_start_x;
@@ -75,8 +72,6 @@ void Game::draw()
 
 		unsigned short decoration_index = 0;
 		unsigned short floor_start_y = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
-		unsigned short hand_texture_height = gbl::SPRITES::HAND_SCALE * sprite_manager.get_sprite_data("HAND").texture_box.height;
-		unsigned short hand_texture_width = gbl::SPRITES::HAND_SCALE * sprite_manager.get_sprite_data("HAND").texture_box.width;
 
 		gbl::SpriteData floor_sprite_data = sprite_manager.get_sprite_data("FLOOR");
 

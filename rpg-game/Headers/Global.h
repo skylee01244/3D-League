@@ -76,10 +76,6 @@ namespace gbl
 	namespace SPRITES
 	{
 		constexpr float FIRE_ANIMATION_SPEED = 0.5f;
-		constexpr float HAND_BOBBING_SPEED = 0.0625f;
-		constexpr float HAND_SCALE = 4;
-
-		constexpr unsigned short HAND_OFFSET_MAX = 64;
 	}
 
 	namespace ENEMY
