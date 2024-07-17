@@ -50,7 +50,7 @@ namespace gbl
 
 	namespace PLAYER
 	{
-		constexpr float MOVEMENT_SPEED = 0.125f;
+		constexpr float MOVEMENT_SPEED = 0.083f;
 	}
 
 	namespace RAYCASTING
@@ -82,7 +82,7 @@ namespace gbl
 	namespace ENEMY
 	{
 		constexpr float MAX_MOVEMENT_DISTANCE = 32;
-		constexpr float MAX_MOVEMENT_SPEED = 0.25f;
+		constexpr float MAX_MOVEMENT_SPEED = 0.15f;
 		constexpr float MIN_MOVEMENT_DISTANCE = 4;
 		constexpr float MIN_MOVEMENT_SPEED = 0.0625f;
 
