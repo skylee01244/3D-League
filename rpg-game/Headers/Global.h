@@ -24,7 +24,7 @@ namespace gbl
 		constexpr unsigned char COLUMNS = 64;
 		constexpr unsigned char ROWS = 64;
 
-		//This cell is used for the map.
+		//map.
 		enum class Cell
 		{
 			Empty,
@@ -35,7 +35,7 @@ namespace gbl
 			Wall
 		};
 
-		//This cell is used for pathfinding.
+		//A* pathfinding.
 		enum class PathCell
 		{
 			Empty,
@@ -69,7 +69,7 @@ namespace gbl
 		constexpr unsigned short HEIGHT = 360;
 		constexpr unsigned short WIDTH = 640;
 
-		//My PC can't handle 60 FPS so we're running it in 30.
+		// 30 FPS
 		constexpr std::chrono::microseconds FRAME_DURATION(33334);
 	}
 

@@ -40,7 +40,7 @@ gbl::MAP::Map<> convert_map_sketch(std::vector<Decoration>& i_decorations, Playe
 			{
 				output_map[a][b] = gbl::MAP::Cell::TextWall;
 			}
-			else if (pixel == sf::Color(182, 0, 0))
+			else if (pixel == sf::Color(12, 74, 119))
 			{
 				i_decorations.push_back(Decoration(0, "BARREL", i_sprite_manager, a, b));
 			}
@@ -48,7 +48,7 @@ gbl::MAP::Map<> convert_map_sketch(std::vector<Decoration>& i_decorations, Playe
 			{
 				i_player.set_position(a, b);
 			}
-			else if (pixel == sf::Color(255, 146, 0))
+			else if (pixel == sf::Color(28, 53, 16))
 			{
 				i_decorations.push_back(Decoration(1, "FIRE_CAULDRON", i_sprite_manager, a, b));
 			}
