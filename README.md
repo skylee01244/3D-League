@@ -16,11 +16,14 @@ cmake --build build
 ```
 4) Move the build/bin/Release/main.exe In the directory with Resources and Run
 
+
 W A S D: to move
 M: To show MiniMap
 Mouse: To look around
 
-Goal: Try to reach the other side of the map without being captured
+
+> [!TIP]
+> Try to reach the other side of the map without being captured
 
 
 
