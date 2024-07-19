@@ -3,15 +3,18 @@ This is a Simple RPG game that is in progress that I am building to learn the ba
 How To Build:
 1) Install CMake https://cmake.org/download/
 2) Open the build folder in the terminal
-
-Windows 
-4) Run cmake ..
-5) Run cmake --build . --config Release
-LINUX & MACOS
-4) cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-5) cmake --build build
-
-7) Move the build/bin/Release/main.exe In the directory with Resources and Run
+3) Build using CMake
+For a multi-configuration generator (Windows)
+```
+cmake ..
+cmake --build . --config Release
+```
+For a single-configuration generator (LINUX & MACOS)
+```
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+4) Move the build/bin/Release/main.exe In the directory with Resources and Run
 
 W A S D: to move
 M: To show MiniMap
