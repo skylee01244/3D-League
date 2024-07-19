@@ -3,13 +3,13 @@ This is a Simple RPG game that is in progress that I am building to learn the ba
 How To Build:
 1) Install CMake https://cmake.org/download/
 2) Open the build folder in the terminal
-3) Build using CMake__
-  For a multi-configuration generator (Windows)
+3) Build using CMake
+> For a multi-configuration generator (Windows)
 ```
 cmake ..
 cmake --build . --config Release
 ```
-  For a single-configuration generator (LINUX & MACOS)
+> For a single-configuration generator (LINUX & MACOS)
 ```
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
