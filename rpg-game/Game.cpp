@@ -16,7 +16,7 @@
 #include "Headers/Game.h"
 
 Game::Game() :
-	show_map(1),
+	show_map(0),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy(sprite_manager)
@@ -278,7 +278,7 @@ void Game::handle_events()
 					}
 				}
 			}
-		}
+		}	
 		player.handle_movement_events(event, map);
 	}
 }
