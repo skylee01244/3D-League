@@ -265,7 +265,6 @@ void Game::handle_events()
 			case sf::Event::Closed:
 			{
 				window.close();
-
 				break;
 			}
 			case sf::Event::KeyPressed:
@@ -275,9 +274,15 @@ void Game::handle_events()
 					case sf::Keyboard::M:
 					{
 						show_map = 1 - show_map;
+						break;
 					}
+					default:
+						break;
 				}
+				break;
 			}
+			default:
+				break;
 		}	
 		player.handle_movement_events(event, map);
 	}
@@ -496,6 +501,14 @@ void Game::raycast()
 		case gbl::MAP::Cell::Wall:
 		{
 			stripes[a].set_sprite_name("WALL");
+		}
+		case gbl::MAP::Cell::Empty:
+		{
+			break;
+		}
+		default:
+		{
+			break;
 		}
 		}
 	}

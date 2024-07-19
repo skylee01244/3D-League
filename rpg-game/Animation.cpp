@@ -70,6 +70,10 @@ bool Animation::update(const char i_animation_end)
 	{
 		return right_end;
 	}
+	default:
+	{
+		return false;
+	}
 	}
 }
 

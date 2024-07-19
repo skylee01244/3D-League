@@ -115,21 +115,33 @@ void Player::handle_movement_events(const sf::Event& event, const gbl::MAP::Map<
         switch (event.key.code)
         {
         case sf::Keyboard::A:
+        {
             step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(90 + direction.x));
             step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(90 + direction.x));
             break;
+        }
         case sf::Keyboard::D:
+        {
             step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x - 90));
             step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x - 90));
             break;
+        }
         case sf::Keyboard::S:
+        {
             step_x -= gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
             step_y += gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
             break;
+        }
         case sf::Keyboard::W:
+        {
             step_x += gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
             step_y -= gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
             break;
+        }
+        default:
+        {
+            break;
+        }
         }
 
         if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
