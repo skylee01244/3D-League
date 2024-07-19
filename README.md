@@ -3,12 +3,14 @@ This is a Simple RPG game that is in progress that I am building to learn the ba
 How To Build:
 1) Install CMake https://cmake.org/download/
 2) Open the build folder in the terminal
-  WINDOWS:
+
+Windows 
 4) Run cmake ..
 5) Run cmake --build . --config Release
-   LINUX & MACOS
+LINUX & MACOS
 4) cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 5) cmake --build build
+
 7) Move the build/bin/Release/main.exe In the directory with Resources and Run
 
 W A S D: to move
