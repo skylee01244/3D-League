@@ -10,8 +10,6 @@ class Game
 {
 	bool show_map;
 
-	float hand_offset;
-
 	std::array<Stripe, gbl::SCREEN::WIDTH> stripes;
 
 	std::vector<Decoration> decorations;

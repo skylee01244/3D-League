@@ -1,8 +1,6 @@
 #pragma once
 #include "Global.h"
 
-//I just realized that this is the first time you're seeing the SpriteManager code.
-//Sooooo... what do you think?
 class SpriteManager
 {
 	std::unordered_map<std::string, gbl::SpriteData> sprites_data;

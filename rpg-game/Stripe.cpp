@@ -47,7 +47,14 @@ float Stripe::get_true_distance() const
 
 short Stripe::get_y() const
 {
-	return round(0.5f * (gbl::SCREEN::HEIGHT - get_height()));
+	float computed_value = 0.5f * (gbl::SCREEN::HEIGHT - get_height());
+	int rounded_value = std::round(computed_value);
+	short clamped_value = std::clamp(
+		rounded_value,
+		static_cast<int>(std::numeric_limits<short>::min()),
+		static_cast<int>(std::numeric_limits<short>::max())
+	);
+	return clamped_value;
 }
 
 unsigned short Stripe::get_height() const
@@ -57,7 +64,14 @@ unsigned short Stripe::get_height() const
 
 unsigned short Stripe::get_side_x() const
 {
-	return floor(side_x * sprite_manager->get_sprite_data(sprite_name).texture_box.width);
+	float scaled_value = side_x * sprite_manager->get_sprite_data(sprite_name).texture_box.width;
+	int rounded_value = std::round(scaled_value);
+	unsigned short clamped_value = std::clamp(
+		rounded_value,
+		static_cast<int>(std::numeric_limits<unsigned short>::min()),
+		static_cast<int>(std::numeric_limits<unsigned short>::max())
+	);
+	return clamped_value;
 }
 
 void Stripe::draw(const short i_pitch, sf::RenderWindow& i_window) const

@@ -205,8 +205,6 @@ void Game::draw()
 		{
 			draw_map();
 		}
-
-		window.display();
 	}
 	else
 	{
@@ -220,8 +218,8 @@ void Game::draw()
 
 		sprite_manager.draw_sprite(0, "STEVEN_SCREAMER", sf::Vector2<short>(screamer_x, screamer_y), window, 0, 0, gbl::ENEMY::SCREAMER_RESIZE, gbl::ENEMY::SCREAMER_RESIZE);
 
-		window.display();
 	}
+	window.display();
 }
 
 void Game::draw_map()
@@ -284,7 +282,7 @@ void Game::handle_events()
 			default:
 				break;
 		}	
-		player.handle_movement_events(event, map);
+		//player.handle_movement_events(event, map);
 	}
 }
 
