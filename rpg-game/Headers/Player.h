@@ -9,6 +9,7 @@ public:
 
 	void set_position(const float i_x, const float i_y);
 	void update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map);
+	void handle_movement_events(const sf::Event& event, const gbl::MAP::Map<>& i_map);
 
 	sf::Vector2f get_direction() const;
 	sf::Vector2f get_position() const;

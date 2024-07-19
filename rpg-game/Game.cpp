@@ -262,23 +262,24 @@ void Game::handle_events()
 	{
 		switch (event.type)
 		{
-		case sf::Event::Closed:
-		{
-			window.close();
-
-			break;
-		}
-		case sf::Event::KeyPressed:
-		{
-			switch (event.key.code)
+			case sf::Event::Closed:
 			{
-				case sf::Keyboard::M:
+				window.close();
+
+				break;
+			}
+			case sf::Event::KeyPressed:
+			{
+				switch (event.key.code)
 				{
-					show_map = 1 - show_map;
+					case sf::Keyboard::M:
+					{
+						show_map = 1 - show_map;
+					}
 				}
 			}
 		}
-		}
+		player.handle_movement_events(event, map);
 	}
 }
 
