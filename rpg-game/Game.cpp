@@ -2,6 +2,7 @@
 #include <chrono>
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
+#include <limits>
 
 #include "Headers/Global.h"
 #include "Headers/AngleFunctions.h"
@@ -55,7 +56,7 @@ void Game::draw()
 {
 	if (0 == enemy.get_screamer())
 	{
-		bool steven_is_drawn = 0;
+		bool enemy_is_drawn = 0;
 
 		//I believe that by changing this, you can change your height in the game.
 		//You can use that if you wanna add jumping or crouching.
@@ -95,9 +96,6 @@ void Game::draw()
 
 		window.clear();
 
-		//Drawing the floor.
-		//For some reason, this part hits heavily on the performance.
-		//I couldn't find a way to optimize it, though.
 		for (unsigned short a = floor_start_y; a < gbl::SCREEN::HEIGHT; a++)
 		{
 			float floor_step_x;
@@ -112,7 +110,7 @@ void Game::draw()
 			unsigned char shade;
 
 			//Distance from the player to the current row we're drawing.
-			row_distance = (0 == row_y) ? FLT_MAX : camera_z / (row_y * vertical_fov_ratio);
+			row_distance = (0 == row_y) ? std::numeric_limits<float>::max() : camera_z / (row_y * vertical_fov_ratio);
 
 			shade = 255 * std::clamp<float>(1 - row_distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
 
@@ -155,15 +153,11 @@ void Game::draw()
 		{
 			while (decoration_index < decorations.size() && stripe.get_distance() < decorations[decoration_index].get_distance())
 			{
-				//I'm repeating the same code 3 times.
-				//I had 2 options:
-				//1) Spending hours trying to figure out the efficient way of doing this.
-				//2) Writing the same code 3 times and tolerating people making fun of me.
-				if (0 == steven_is_drawn)
+				if (0 == enemy_is_drawn)
 				{
 					if (enemy.get_distance() > decorations[decoration_index].get_distance())
 					{
-						steven_is_drawn = 1;
+						enemy_is_drawn = 1;
 
 						enemy.draw(pitch, window);
 					}
@@ -174,11 +168,11 @@ void Game::draw()
 				decoration_index++;
 			}
 
-			if (0 == steven_is_drawn)
+			if (0 == enemy_is_drawn)
 			{
 				if (enemy.get_distance() > stripe.get_distance())
 				{
-					steven_is_drawn = 1;
+					enemy_is_drawn = 1;
 
 					enemy.draw(pitch, window);
 				}
@@ -189,11 +183,11 @@ void Game::draw()
 
 		for (unsigned short a = decoration_index; a < decorations.size(); a++)
 		{
-			if (0 == steven_is_drawn)
+			if (0 == enemy_is_drawn)
 			{
 				if (enemy.get_distance() > decorations[a].get_distance())
 				{
-					steven_is_drawn = 1;
+					enemy_is_drawn = 1;
 
 					enemy.draw(pitch, window);
 				}
@@ -202,7 +196,7 @@ void Game::draw()
 			decorations[a].draw(pitch, window);
 		}
 
-		if (0 == steven_is_drawn)
+		if (0 == enemy_is_drawn)
 		{
 			enemy.draw(pitch, window);
 		}
@@ -219,7 +213,6 @@ void Game::draw()
 		short screamer_x = 0.5f * (gbl::SCREEN::WIDTH - gbl::ENEMY::SCREAMER_RESIZE * sprite_manager.get_sprite_data("STEVEN_SCREAMER").texture_box.width);
 		short screamer_y = gbl::ENEMY::SCREAMER_Y;
 
-		//By the end of the project I became so lazy I didn't wanna bother working with the random library so I used rand().
 		screamer_x += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
 		screamer_y += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
 
@@ -265,7 +258,7 @@ void Game::draw_map()
 
 void Game::handle_events()
 {
-	while (1 == window.pollEvent(event))
+	while (window.pollEvent(event))
 	{
 		switch (event.type)
 		{
@@ -294,8 +287,6 @@ void Game::raycast()
 	float ray_start_x = 0.5f + player.get_position().x;
 	float ray_start_y = 0.5f + player.get_position().y;
 
-	//It's almost impossible to explain everything here without visuals.
-	//But I'll try my best.
 	for (unsigned short a = 0; a < gbl::SCREEN::WIDTH; a++)
 	{
 		char cell_step_x = 0;
@@ -312,10 +303,10 @@ void Game::raycast()
 		float side_x;
 		//This ray checks for horizontal collisions.
 		float x_ray_length = 0;
-		float x_ray_unit_length = (0 == ray_direction_x) ? FLT_MAX : std::abs(1 / ray_direction_x);
+		float x_ray_unit_length = (0 == ray_direction_x) ? std::numeric_limits<float>::max() : std::abs(1 / ray_direction_x);
 		//This ray checks for vertical collisions.
 		float y_ray_length = 0;
-		float y_ray_unit_length = (0 == ray_direction_y) ? FLT_MAX : std::abs(1 / ray_direction_y);
+		float y_ray_unit_length = (0 == ray_direction_y) ? std::numeric_limits<float>::max() : std::abs(1 / ray_direction_y);
 
 		unsigned char current_cell_x = floor(ray_start_x);
 		unsigned char current_cell_y = floor(ray_start_y);

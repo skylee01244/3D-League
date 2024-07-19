@@ -2,6 +2,7 @@
 #include <chrono>
 #include <map>
 #include <SFML/Graphics.hpp>
+#include <limits>
 
 #include "Headers/Global.h"
 #include "Headers/GetCell.h"
@@ -52,8 +53,8 @@ void astar_reset(unsigned short& i_path_length, std::map<gbl::Position<>, gbl::P
 			}
 			else
 			{
-				i_f_scores[a][b] = FLT_MAX;
-				i_g_scores[a][b] = FLT_MAX;
+				i_f_scores[a][b] = std::numeric_limits<float>::max();
+				i_g_scores[a][b] = std::numeric_limits<float>::max();
 			}
 		}
 	}
@@ -83,7 +84,7 @@ void astar_search(unsigned short& i_path_length, std::map<gbl::Position<>, gbl::
 
 		min_f_cell = *min_f_cell_iterator;
 
-		if (FLT_MAX == i_f_scores[min_f_cell.x][min_f_cell.y])
+		if (std::numeric_limits<float>::max() == i_f_scores[min_f_cell.x][min_f_cell.y])
 		{
 			return;
 		}
