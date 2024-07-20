@@ -12,7 +12,6 @@ Player::Player(const float i_x, const float i_y) :
 	direction(0, 0),
 	position(i_x, i_y)
 {
-
 }
 
 void Player::set_position(const float i_x, const float i_y)

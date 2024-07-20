@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
 #include <limits>
+#include <iostream>
 
 #include "Headers/Global.h"
 #include "Headers/AngleFunctions.h"
@@ -17,11 +18,12 @@
 
 Game::Game() :
 	show_map(0),
+	game_start(0),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy(sprite_manager)
 {
-	window.setMouseCursorVisible(0);
+	window.setMouseCursorVisible(1);
 	window.setView(sf::View(sf::FloatRect(0, 0, gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT)));
 
 	map = convert_map_sketch(decorations, player, enemy, sprite_manager);
@@ -54,108 +56,140 @@ void Game::calculate_fov_visualization()
 
 void Game::draw()
 {
-	if (0 == enemy.get_screamer())
-	{
-		bool enemy_is_drawn = 0;
-
-		//I believe that by changing this, you can change your height in the game.
-		//You can use that if you wanna add jumping or crouching.
-		float camera_z = 0.5f * gbl::SCREEN::HEIGHT;
-		float end_stripe_x = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
-		float ray_direction_end_x;
-		float ray_direction_end_y;
-		float ray_direction_start_x;
-		float ray_direction_start_y;
-		float start_stripe_x = -tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
-		float vertical_fov_ratio = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
-
-		short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(deg_to_rad(player.get_direction().y)));
-
-		unsigned short decoration_index = 0;
-		unsigned short floor_start_y = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
-
-		gbl::SpriteData floor_sprite_data = sprite_manager.get_sprite_data("FLOOR");
-
-		sf::Image floor_image;
-		floor_image.loadFromFile(floor_sprite_data.image_location);
-
-		//We're gonna draw the floor in this buffer image because the floor is drawn pixel by pixel.
-		//I tried drawing directly on the screen. I stopped when my PC started cooking eggs.
-		sf::Image floor_buffer_image;
-		floor_buffer_image.create(gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT - floor_start_y);
-
-		sf::Sprite floor_sprite;
-		floor_sprite.setPosition(0, floor_start_y);
-
-		sf::Texture floor_texture;
-
-		ray_direction_end_x = cos(deg_to_rad(player.get_direction().x)) + end_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
-		ray_direction_end_y = -sin(deg_to_rad(player.get_direction().x)) - end_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
-		ray_direction_start_x = cos(deg_to_rad(player.get_direction().x)) + start_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
-		ray_direction_start_y = -sin(deg_to_rad(player.get_direction().x)) - start_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
-
-		window.clear();
-
-		for (unsigned short a = floor_start_y; a < gbl::SCREEN::HEIGHT; a++)
+	if (game_start == 0) {
+		//std::cout << "Start screen is set" << std::endl;
+		sf::Texture texture;
+		if (!texture.loadFromFile("Resources/Images/StartScreen.png"))
 		{
-			float floor_step_x;
-			float floor_step_y;
-			double floor_x;
-			double floor_y;
-			float row_distance;
+			std::cout << "Error in loading Start Screen" << std::endl;
+		}
+		else
+		{
+			texture.loadFromFile("Resources/Images/StartScreen.png");
+		}
+		rectangle.setSize(sf::Vector2f(640.f, 360.f));
+		rectangle.setTexture(&texture);
+		window.draw(rectangle);
+	}
+	else 
+	{
+		if (0 == enemy.get_screamer())
+		{
+			bool enemy_is_drawn = 0;
 
-			//We're drawing the floor row by row from top to bottom.
-			short row_y = a - pitch - 0.5f * gbl::SCREEN::HEIGHT;
+			//I believe that by changing this, you can change your height in the game.
+			//You can use that if you wanna add jumping or crouching.
+			float camera_z = 0.5f * gbl::SCREEN::HEIGHT;
+			float end_stripe_x = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
+			float ray_direction_end_x;
+			float ray_direction_end_y;
+			float ray_direction_start_x;
+			float ray_direction_start_y;
+			float start_stripe_x = -tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
+			float vertical_fov_ratio = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
 
-			unsigned char shade;
+			short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(deg_to_rad(player.get_direction().y)));
 
-			//Distance from the player to the current row we're drawing.
-			row_distance = (0 == row_y) ? std::numeric_limits<float>::max() : camera_z / (row_y * vertical_fov_ratio);
+			unsigned short decoration_index = 0;
+			unsigned short floor_start_y = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
 
-			shade = 255 * std::clamp<float>(1 - row_distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
+			gbl::SpriteData floor_sprite_data = sprite_manager.get_sprite_data("FLOOR");
 
-			if (0 < shade)
+			sf::Image floor_image;
+			floor_image.loadFromFile(floor_sprite_data.image_location);
+
+			//We're gonna draw the floor in this buffer image because the floor is drawn pixel by pixel.
+			//I tried drawing directly on the screen. I stopped when my PC started cooking eggs.
+			sf::Image floor_buffer_image;
+			floor_buffer_image.create(gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT - floor_start_y);
+
+			sf::Sprite floor_sprite;
+			floor_sprite.setPosition(0, floor_start_y);
+
+			sf::Texture floor_texture;
+
+			ray_direction_end_x = cos(deg_to_rad(player.get_direction().x)) + end_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
+			ray_direction_end_y = -sin(deg_to_rad(player.get_direction().x)) - end_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
+			ray_direction_start_x = cos(deg_to_rad(player.get_direction().x)) + start_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
+			ray_direction_start_y = -sin(deg_to_rad(player.get_direction().x)) - start_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
+
+			window.clear();
+
+			for (unsigned short a = floor_start_y; a < gbl::SCREEN::HEIGHT; a++)
 			{
-				floor_step_x = row_distance * (ray_direction_end_x - ray_direction_start_x) / gbl::SCREEN::WIDTH;
-				floor_step_y = row_distance * (ray_direction_end_y - ray_direction_start_y) / gbl::SCREEN::WIDTH;
-				//You can get the position of the current floor cell we're drawing using these variables (floor(floor_x) and floor(floor_y)).
-				//Then you'll be able to draw different floor textures.
-				floor_x = 0.5f + player.get_position().x + ray_direction_start_x * row_distance;
-				floor_y = 0.5f + player.get_position().y + ray_direction_start_y * row_distance;
+				float floor_step_x;
+				float floor_step_y;
+				double floor_x;
+				double floor_y;
+				float row_distance;
 
-				for (unsigned short b = 0; b < gbl::SCREEN::WIDTH; b++)
+				//We're drawing the floor row by row from top to bottom.
+				short row_y = a - pitch - 0.5f * gbl::SCREEN::HEIGHT;
+
+				unsigned char shade;
+
+				//Distance from the player to the current row we're drawing.
+				row_distance = (0 == row_y) ? std::numeric_limits<float>::max() : camera_z / (row_y * vertical_fov_ratio);
+
+				shade = 255 * std::clamp<float>(1 - row_distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
+
+				if (0 < shade)
 				{
-					sf::Color floor_image_pixel = floor_image.getPixel(floor(floor_sprite_data.texture_box.width * (5 + floor_x - floor(floor_x))), floor(floor_sprite_data.texture_box.height * (floor_y - floor(floor_y))));
+					floor_step_x = row_distance * (ray_direction_end_x - ray_direction_start_x) / gbl::SCREEN::WIDTH;
+					floor_step_y = row_distance * (ray_direction_end_y - ray_direction_start_y) / gbl::SCREEN::WIDTH;
+					//You can get the position of the current floor cell we're drawing using these variables (floor(floor_x) and floor(floor_y)).
+					//Then you'll be able to draw different floor textures.
+					floor_x = 0.5f + player.get_position().x + ray_direction_start_x * row_distance;
+					floor_y = 0.5f + player.get_position().y + ray_direction_start_y * row_distance;
 
-					floor_x += floor_step_x;
-					floor_y += floor_step_y;
+					for (unsigned short b = 0; b < gbl::SCREEN::WIDTH; b++)
+					{
+						sf::Color floor_image_pixel = floor_image.getPixel(floor(floor_sprite_data.texture_box.width * (5 + floor_x - floor(floor_x))), floor(floor_sprite_data.texture_box.height * (floor_y - floor(floor_y))));
 
-					floor_image_pixel *= sf::Color(shade, shade, shade);
+						floor_x += floor_step_x;
+						floor_y += floor_step_y;
 
-					floor_buffer_image.setPixel(b, a - floor_start_y, floor_image_pixel);
+						floor_image_pixel *= sf::Color(shade, shade, shade);
+
+						floor_buffer_image.setPixel(b, a - floor_start_y, floor_image_pixel);
+					}
 				}
 			}
-		}
 
-		floor_texture.loadFromImage(floor_buffer_image);
+			floor_texture.loadFromImage(floor_buffer_image);
 
-		floor_sprite.setTexture(floor_texture);
+			floor_sprite.setTexture(floor_texture);
 
-		window.draw(floor_sprite);
+			window.draw(floor_sprite);
 
-		calculate_fov_visualization();
+			calculate_fov_visualization();
 
-		std::sort(decorations.begin(), decorations.end(), std::greater());
-		std::sort(stripes.begin(), stripes.end(), std::greater());
+			std::sort(decorations.begin(), decorations.end(), std::greater());
+			std::sort(stripes.begin(), stripes.end(), std::greater());
 
-		//Drawing things layer by layer.
-		for (Stripe& stripe : stripes)
-		{
-			while (decoration_index < decorations.size() && stripe.get_distance() < decorations[decoration_index].get_distance())
+			//Drawing things layer by layer.
+			for (Stripe& stripe : stripes)
 			{
+				while (decoration_index < decorations.size() && stripe.get_distance() < decorations[decoration_index].get_distance())
+				{
+					if (0 == enemy_is_drawn)
+					{
+						if (enemy.get_distance() > decorations[decoration_index].get_distance())
+						{
+							enemy_is_drawn = 1;
+
+							enemy.draw(pitch, window);
+						}
+					}
+
+					decorations[decoration_index].draw(pitch, window);
+
+					decoration_index++;
+				}
+
 				if (0 == enemy_is_drawn)
 				{
-					if (enemy.get_distance() > decorations[decoration_index].get_distance())
+					if (enemy.get_distance() > stripe.get_distance())
 					{
 						enemy_is_drawn = 1;
 
@@ -163,61 +197,47 @@ void Game::draw()
 					}
 				}
 
-				decorations[decoration_index].draw(pitch, window);
+				stripe.draw(pitch, window);
+			}
 
-				decoration_index++;
+			for (unsigned short a = decoration_index; a < decorations.size(); a++)
+			{
+				if (0 == enemy_is_drawn)
+				{
+					if (enemy.get_distance() > decorations[a].get_distance())
+					{
+						enemy_is_drawn = 1;
+
+						enemy.draw(pitch, window);
+					}
+				}
+
+				decorations[a].draw(pitch, window);
 			}
 
 			if (0 == enemy_is_drawn)
 			{
-				if (enemy.get_distance() > stripe.get_distance())
-				{
-					enemy_is_drawn = 1;
-
-					enemy.draw(pitch, window);
-				}
+				enemy.draw(pitch, window);
 			}
 
-			stripe.draw(pitch, window);
-		}
-
-		for (unsigned short a = decoration_index; a < decorations.size(); a++)
-		{
-			if (0 == enemy_is_drawn)
+			if (1 == show_map)
 			{
-				if (enemy.get_distance() > decorations[a].get_distance())
-				{
-					enemy_is_drawn = 1;
-
-					enemy.draw(pitch, window);
-				}
+				draw_map();
 			}
-
-			decorations[a].draw(pitch, window);
 		}
-
-		if (0 == enemy_is_drawn)
+		else
 		{
-			enemy.draw(pitch, window);
+			short screamer_x = 0.5f * (gbl::SCREEN::WIDTH - gbl::ENEMY::SCREAMER_RESIZE * sprite_manager.get_sprite_data("STEVEN_SCREAMER").texture_box.width);
+			short screamer_y = gbl::ENEMY::SCREAMER_Y;
+
+			screamer_x += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
+			screamer_y += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
+
+			window.clear();
+
+			sprite_manager.draw_sprite(0, "STEVEN_SCREAMER", sf::Vector2<short>(screamer_x, screamer_y), window, 0, 0, gbl::ENEMY::SCREAMER_RESIZE, gbl::ENEMY::SCREAMER_RESIZE);
+
 		}
-
-		if (1 == show_map)
-		{
-			draw_map();
-		}
-	}
-	else
-	{
-		short screamer_x = 0.5f * (gbl::SCREEN::WIDTH - gbl::ENEMY::SCREAMER_RESIZE * sprite_manager.get_sprite_data("STEVEN_SCREAMER").texture_box.width);
-		short screamer_y = gbl::ENEMY::SCREAMER_Y;
-
-		screamer_x += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
-		screamer_y += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
-
-		window.clear();
-
-		sprite_manager.draw_sprite(0, "STEVEN_SCREAMER", sf::Vector2<short>(screamer_x, screamer_y), window, 0, 0, gbl::ENEMY::SCREAMER_RESIZE, gbl::ENEMY::SCREAMER_RESIZE);
-
 	}
 	window.display();
 }
@@ -272,6 +292,11 @@ void Game::handle_events()
 					case sf::Keyboard::M:
 					{
 						show_map = 1 - show_map;
+						break;
+					}
+					case sf::Keyboard::Enter:
+					{
+						game_start = 1;
 						break;
 					}
 					default:
@@ -519,7 +544,7 @@ void Game::set_title(const std::string& i_title)
 
 void Game::update(float deltaTime)
 {
-	if (0 == enemy.get_screamer())
+	if (enemy.get_screamer() == 0 && game_start != 0)
 	{
 		float player_movement_distance;
 

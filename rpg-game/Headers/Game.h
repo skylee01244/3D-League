@@ -9,6 +9,7 @@
 class Game
 {
 	bool show_map;
+	bool game_start;
 
 	std::array<Stripe, gbl::SCREEN::WIDTH> stripes;
 
@@ -20,6 +21,8 @@ class Game
 
 	sf::VertexArray fov_visualization;
 
+	sf::RectangleShape rectangle;
+
 	SpriteManager sprite_manager;
 
 	Player player;
@@ -30,9 +33,7 @@ class Game
 
 public:
 	Game();
-
 	bool is_open() const;
-
 	void calculate_fov_visualization();
 	void draw();
 	void draw_map();
