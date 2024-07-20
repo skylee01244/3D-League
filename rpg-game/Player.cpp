@@ -1,7 +1,12 @@
 #include <array>
 #include <chrono>
-#include <SFML/Graphics.hpp>
 #include <iostream>
+#ifdef __APPLE__
+#include <ApplicationServices/ApplicationServices.h> // For macOS
+#elif defined(_WIN32)
+#include <windows.h> // For Windows
+#endif
+#include <SFML/Graphics.hpp>
 
 #include "Headers/AngleFunctions.h"
 #include "Headers/Global.h"
@@ -107,48 +112,35 @@ void Player::set_position(const float i_x, const float i_y)
 
 void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map, float deltaTime)
 {
-    static sf::Vector2i last_mouse_position = sf::Mouse::getPosition(i_window);
-    static bool resetting_mouse = false; // Flag to indicate manual mouse reset
-
     if (i_window.hasFocus())
     {
-        sf::Vector2i current_mouse_position = sf::Mouse::getPosition(i_window);
+        float deltaX = 0;
+        float deltaY = 0;
 
-        // Calculate the delta movement
-        sf::Vector2i delta = current_mouse_position - last_mouse_position;
+#ifdef __APPLE__
+        // Get the mouse delta for macOS
+        int32_t macDeltaX, macDeltaY;
+        CGGetLastMouseDelta(&macDeltaX, &macDeltaY);
+        deltaX = static_cast<float>(macDeltaX);
+        deltaY = static_cast<float>(macDeltaY);
+#elif defined(_WIN32)
+        // Get the mouse delta for Windows
+        POINT mousePos;
+        static POINT lastMousePos = { 0, 0 };
+        GetCursorPos(&mousePos);
 
-        // Center of the window
-        unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
-        unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
-        sf::Vector2i window_center(window_center_x, window_center_y);
+        deltaX = static_cast<float>(mousePos.x - lastMousePos.x);
+        deltaY = static_cast<float>(mousePos.y - lastMousePos.y);
 
-        if (!resetting_mouse)
-        {
-            // Calculate rotations based on the delta
-            float rotation_horizontal = -gbl::RAYCASTING::FOV_HORIZONTAL * delta.x / i_window.getSize().x;
-            float rotation_vertical = -gbl::RAYCASTING::FOV_VERTICAL * delta.y / i_window.getSize().y;
+        lastMousePos = mousePos;
+#endif
 
-            direction.x = get_degrees(direction.x + rotation_horizontal);
-            direction.y = std::clamp<float>(direction.y + rotation_vertical, -gbl::RAYCASTING::MAX_VERTICAL_DIRECTION, gbl::RAYCASTING::MAX_VERTICAL_DIRECTION);
+        // Calculate rotations based on the delta
+        float rotation_horizontal = -gbl::RAYCASTING::FOV_HORIZONTAL * deltaX / i_window.getSize().x;
+        float rotation_vertical = -gbl::RAYCASTING::FOV_VERTICAL * deltaY / i_window.getSize().y;
 
-            // Reset mouse position to the center if it reaches the edge
-            if (current_mouse_position.x <= 0 || current_mouse_position.x >= i_window.getSize().x - 1 ||
-                current_mouse_position.y <= 0 || current_mouse_position.y >= i_window.getSize().y - 1)
-            {
-                resetting_mouse = true; // Set the flag before resetting
-                sf::Mouse::setPosition(window_center, i_window);
-            }
-            else
-            {
-                last_mouse_position = current_mouse_position; // Update last_mouse_position to the current one
-            }
-        }
-        else
-        {
-            // When the mouse is manually reset, just update the last mouse position
-            last_mouse_position = window_center;
-            resetting_mouse = false; // Reset the flag after the manual reset
-        }
+        direction.x = get_degrees(direction.x + rotation_horizontal);
+        direction.y = std::clamp<float>(direction.y + rotation_vertical, -gbl::RAYCASTING::MAX_VERTICAL_DIRECTION, gbl::RAYCASTING::MAX_VERTICAL_DIRECTION);
 
         // Key movement
         float step_x = 0;
@@ -201,7 +193,7 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
         // If the window is not focused, reset the last mouse position to the center
         unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
         unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
-        last_mouse_position = sf::Vector2i(window_center_x, window_center_y);
+        sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), i_window);
     }
 }
 
