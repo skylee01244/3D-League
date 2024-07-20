@@ -21,70 +21,70 @@ void Player::set_position(const float i_x, const float i_y)
 	position.y = i_y;
 }
 
-void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map)
-{
-	if (1 == i_window.hasFocus())
-	{
-		float rotation_horizontal = 0;
-		float rotation_vertical = 0;
-		float step_x = 0;
-		float step_y = 0;
-
-		unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
-		unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
-
-		rotation_horizontal = gbl::RAYCASTING::FOV_HORIZONTAL * (window_center_x - sf::Mouse::getPosition(i_window).x) / i_window.getSize().x;
-		rotation_vertical = gbl::RAYCASTING::FOV_VERTICAL * (window_center_y - sf::Mouse::getPosition(i_window).y) / i_window.getSize().y;
-
-		direction.x = get_degrees(direction.x + rotation_horizontal);
-		direction.y = std::clamp<float>(direction.y + rotation_vertical, -gbl::RAYCASTING::MAX_VERTICAL_DIRECTION, gbl::RAYCASTING::MAX_VERTICAL_DIRECTION);
-
-		sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), i_window);
-
-		if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		{
-			step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(90 + direction.x));
-			step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(90 + direction.x));
-		}
-		else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		{
-			step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x - 90));
-			step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x - 90));
-		}
-
-		if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		{
-			step_x -= gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
-			step_y += gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
-		}
-		else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		{
-			step_x += gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
-			step_y -= gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
-		}
-
-		if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
-		{
-			position.x += step_x;
-			position.y += step_y;
-		}
-		else if (0 == map_collision(step_x + position.x, position.y, i_map))
-		{
-			position.x += step_x;
-			position.y = round(position.y);
-		}
-		else if (0 == map_collision(position.x, step_y + position.y, i_map))
-		{
-			position.x = round(position.x);
-			position.y += step_y;
-		}
-		else
-		{
-			position.x = round(position.x);
-			position.y = round(position.y);
-		}
-	}
-}
+//void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map)
+//{
+//	if (1 == i_window.hasFocus())
+//	{
+//		float rotation_horizontal = 0;
+//		float rotation_vertical = 0;
+//		float step_x = 0;
+//		float step_y = 0;
+//
+//		unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
+//		unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
+//
+//		rotation_horizontal = gbl::RAYCASTING::FOV_HORIZONTAL * (window_center_x - sf::Mouse::getPosition(i_window).x) / i_window.getSize().x;
+//		rotation_vertical = gbl::RAYCASTING::FOV_VERTICAL * (window_center_y - sf::Mouse::getPosition(i_window).y) / i_window.getSize().y;
+//
+//		direction.x = get_degrees(direction.x + rotation_horizontal);
+//		direction.y = std::clamp<float>(direction.y + rotation_vertical, -gbl::RAYCASTING::MAX_VERTICAL_DIRECTION, gbl::RAYCASTING::MAX_VERTICAL_DIRECTION);
+//
+//		sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), i_window);
+//
+//		if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+//		{
+//			step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(90 + direction.x));
+//			step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(90 + direction.x));
+//		}
+//		else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+//		{
+//			step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x - 90));
+//			step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x - 90));
+//		}
+//
+//		if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+//		{
+//			step_x -= gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
+//			step_y += gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
+//		}
+//		else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+//		{
+//			step_x += gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
+//			step_y -= gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
+//		}
+//
+//		if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
+//		{
+//			position.x += step_x;
+//			position.y += step_y;
+//		}
+//		else if (0 == map_collision(step_x + position.x, position.y, i_map))
+//		{
+//			position.x += step_x;
+//			position.y = round(position.y);
+//		}
+//		else if (0 == map_collision(position.x, step_y + position.y, i_map))
+//		{
+//			position.x = round(position.x);
+//			position.y += step_y;
+//		}
+//		else
+//		{
+//			position.x = round(position.x);
+//			position.y = round(position.y);
+//		}
+//	}
+//}
 
 //void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map)
 //{
@@ -105,68 +105,106 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
 //        sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), i_window);
 //    }
 //}
-//
-//void Player::handle_movement_events(const sf::Event& event, const gbl::MAP::Map<>& i_map)
-//{
-//    if (event.type == sf::Event::KeyPressed)
-//    {
-//        float step_x = 0;
-//        float step_y = 0;
-//
-//        switch (event.key.code)
-//        {
-//        case sf::Keyboard::A:
-//        {
-//            step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(90 + direction.x));
-//            step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(90 + direction.x));
-//            break;
-//        }
-//        case sf::Keyboard::D:
-//        {
-//            step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x - 90));
-//            step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x - 90));
-//            break;
-//        }
-//        case sf::Keyboard::S:
-//        {
-//            step_x -= gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
-//            step_y += gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
-//            break;
-//        }
-//        case sf::Keyboard::W:
-//        {
-//            step_x += gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
-//            step_y -= gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
-//            break;
-//        }
-//        default:
-//        {
-//            break;
-//        }
-//        }
-//
-//        if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
-//        {
-//            position.x += step_x;
-//            position.y += step_y;
-//        }
-//        else if (0 == map_collision(step_x + position.x, position.y, i_map))
-//        {
-//            position.x += step_x;
-//            position.y = round(position.y);
-//        }
-//        else if (0 == map_collision(position.x, step_y + position.y, i_map))
-//        {
-//            position.x = round(position.x);
-//            position.y += step_y;
-//        }
-//        else
-//        {
-//            position.x = round(position.x);
-//            position.y = round(position.y);
-//        }
-//    }
-//}
+
+void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map)
+{
+    static sf::Vector2i last_mouse_position = sf::Mouse::getPosition(i_window);
+
+    if (i_window.hasFocus())
+    {
+        sf::Vector2i current_mouse_position = sf::Mouse::getPosition(i_window);
+
+        // Calculate the delta movement
+        sf::Vector2i delta = current_mouse_position - last_mouse_position;
+
+        // Update the last mouse position to the current one
+        last_mouse_position = current_mouse_position;
+
+        // Invert the horizontal and vertical rotation calculations
+        float rotation_horizontal = -gbl::RAYCASTING::FOV_HORIZONTAL * delta.x / i_window.getSize().x;
+        float rotation_vertical = -gbl::RAYCASTING::FOV_VERTICAL * delta.y / i_window.getSize().y;
+
+        direction.x = get_degrees(direction.x + rotation_horizontal);
+        direction.y = std::clamp<float>(direction.y + rotation_vertical, -gbl::RAYCASTING::MAX_VERTICAL_DIRECTION, gbl::RAYCASTING::MAX_VERTICAL_DIRECTION);
+
+        // Optionally reset mouse position to the center
+        unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
+        unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
+        sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), i_window);
+
+        // Reset last mouse position to the center after resetting the mouse position
+        last_mouse_position = sf::Mouse::getPosition(i_window);
+    }
+    else
+    {
+        // If the window is not focused, reset the last mouse position to the center
+        unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
+        unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
+        last_mouse_position = sf::Vector2i(window_center_x, window_center_y);
+    }
+}
+
+void Player::handle_movement_events(const sf::Event& event, const gbl::MAP::Map<>& i_map)
+{
+    if (event.type == sf::Event::KeyPressed)
+    {
+        float step_x = 0;
+        float step_y = 0;
+
+        switch (event.key.code)
+        {
+        case sf::Keyboard::A:
+        {
+            step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(90 + direction.x));
+            step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(90 + direction.x));
+            break;
+        }
+        case sf::Keyboard::D:
+        {
+            step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x - 90));
+            step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x - 90));
+            break;
+        }
+        case sf::Keyboard::S:
+        {
+            step_x -= gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
+            step_y += gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
+            break;
+        }
+        case sf::Keyboard::W:
+        {
+            step_x += gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
+            step_y -= gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+
+        if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
+        {
+            position.x += step_x;
+            position.y += step_y;
+        }
+        else if (0 == map_collision(step_x + position.x, position.y, i_map))
+        {
+            position.x += step_x;
+            position.y = round(position.y);
+        }
+        else if (0 == map_collision(position.x, step_y + position.y, i_map))
+        {
+            position.x = round(position.x);
+            position.y += step_y;
+        }
+        else
+        {
+            position.x = round(position.x);
+            position.y = round(position.y);
+        }
+    }
+}
 
 sf::Vector2f Player::get_direction() const
 {

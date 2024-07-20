@@ -282,7 +282,7 @@ void Game::handle_events()
 			default:
 				break;
 		}	
-		//player.handle_movement_events(event, map);
+		player.handle_movement_events(event, map);
 	}
 }
 
