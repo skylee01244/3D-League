@@ -48,7 +48,7 @@ public:
 	void draw(const short i_pitch, sf::RenderWindow& i_window);
 	void fill_map(const gbl::MAP::Map<>& i_map);
 	void set_position(const float i_x, const float i_y);
-	void update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player_direction, const sf::Vector2f& i_player_position, const gbl::MAP::Map<>& i_map);
+	void update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player_direction, const sf::Vector2f& i_player_position, const gbl::MAP::Map<>& i_map, float deltaTime);
 
 	sf::Vector2f get_position() const;
 };

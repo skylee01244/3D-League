@@ -36,16 +36,16 @@
 #*.wwaproj   merge=binary
 
 ###############################################################################
-# behavior for image files
+# Behavior for image files
 #
-# image files are treated as binary by default.
+# Image files are treated as binary by default.
 ###############################################################################
-#*.jpg   binary
-#*.png   binary
-#*.gif   binary
+*.jpg   binary
+*.png   binary
+*.gif   binary
 
 ###############################################################################
-# diff behavior for common document formats
+# Diff behavior for common document formats
 # 
 # Convert binary document formats to text before diffing them. This feature
 # is only available from the command line. Turn it on by uncommenting the 
@@ -61,3 +61,17 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# Custom settings for specific file types
+###############################################################################
+# C++ source files
+*.cpp text eol=lf
+*.hpp text eol=lf
+*.h text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Batch files
+*.bat text eol=crlf

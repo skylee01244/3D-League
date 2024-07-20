@@ -517,7 +517,7 @@ void Game::set_title(const std::string& i_title)
 	window.setTitle(i_title);
 }
 
-void Game::update()
+void Game::update(float deltaTime)
 {
 	if (0 == enemy.get_screamer())
 	{
@@ -525,9 +525,9 @@ void Game::update()
 
 		sf::Vector2f player_position = player.get_position();
 
-		player.update(window, map);
+		player.update(window, map, deltaTime);
 
-		enemy.update(window, player.get_direction(), player.get_position(), map);
+		enemy.update(window, player.get_direction(), player.get_position(), map, deltaTime);
 
 		player_movement_distance = sqrt(pow(player_position.x - player.get_position().x, 2) + pow(player_position.y - player.get_position().y, 2));
 

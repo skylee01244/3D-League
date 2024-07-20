@@ -39,5 +39,5 @@ public:
 	void handle_events();
 	void raycast();
 	void set_title(const std::string& i_title);
-	void update();
+	void update(float deltaTime);
 };

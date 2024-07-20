@@ -108,7 +108,7 @@ void Enemy::set_position(const float i_x, const float i_y)
 	next_cell.y = position.y;
 }
 
-void Enemy::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player_direction, const sf::Vector2f& i_player_position, const gbl::MAP::Map<>& i_map)
+void Enemy::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player_direction, const sf::Vector2f& i_player_position, const gbl::MAP::Map<>& i_map, float deltaTime)
 {
 	if (1 == i_window.hasFocus())
 	{
@@ -154,20 +154,20 @@ void Enemy::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_playe
 		//Steven moves to the next cell in the A star path.
 		if (next_cell.x < position.x)
 		{
-			step_x = std::max(-speed, next_cell.x - position.x);
+			step_x = std::max(-speed * deltaTime, next_cell.x - position.x);
 		}
 		else if (next_cell.x > position.x)
 		{
-			step_x = std::min(speed, next_cell.x - position.x);
+			step_x = std::min(speed * deltaTime, next_cell.x - position.x);
 		}
 
 		if (next_cell.y < position.y)
 		{
-			step_y = std::max(-speed, next_cell.y - position.y);
+			step_y = std::max(-speed * deltaTime, next_cell.y - position.y);
 		}
 		else if (next_cell.y > position.y)
 		{
-			step_y = std::min(speed, next_cell.y - position.y);
+			step_y = std::min(speed * deltaTime, next_cell.y - position.y);
 		}
 
 		if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))

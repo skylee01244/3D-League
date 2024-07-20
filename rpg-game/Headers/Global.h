@@ -50,7 +50,7 @@ namespace gbl
 
 	namespace PLAYER
 	{
-		constexpr float MOVEMENT_SPEED = 0.083f;
+		constexpr float MOVEMENT_SPEED = 3.5f;
 	}
 
 	namespace RAYCASTING
@@ -69,8 +69,9 @@ namespace gbl
 		constexpr unsigned short HEIGHT = 360;
 		constexpr unsigned short WIDTH = 640;
 
-		// 30 FPS
-		constexpr std::chrono::microseconds FRAME_DURATION(33334);
+		//constexpr std::chrono::microseconds FRAME_DURATION(33334);	// 30 fps
+		//constexpr std::chrono::microseconds FRAME_DURATION(25000); // 40 FPS
+		constexpr std::chrono::microseconds FRAME_DURATION(16667); // 60 FPS
 	}
 
 	namespace SPRITES
@@ -82,9 +83,9 @@ namespace gbl
 	namespace ENEMY
 	{
 		constexpr float MAX_MOVEMENT_DISTANCE = 32;
-		constexpr float MAX_MOVEMENT_SPEED = 0.15f;
+		constexpr float MAX_MOVEMENT_SPEED = 6.1f;
 		constexpr float MIN_MOVEMENT_DISTANCE = 4;
-		constexpr float MIN_MOVEMENT_SPEED = 0.0625f;
+		constexpr float MIN_MOVEMENT_SPEED = 2.5f;
 
 		constexpr short SCREAMER_Y = -64;
 
