@@ -2,8 +2,13 @@
 
 class Player
 {
+private:
 	sf::Vector2f direction;
 	sf::Vector2f position;
+	bool moving_left = false;
+	bool moving_right = false;
+	bool moving_forward = false;
+	bool moving_backward = false;
 public:
 	Player(const float i_x = 0, const float i_y = 0);
 

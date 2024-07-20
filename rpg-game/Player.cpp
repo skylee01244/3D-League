@@ -117,70 +117,53 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
         // Calculate the delta movement
         sf::Vector2i delta = current_mouse_position - last_mouse_position;
 
-        // Update the last mouse position to the current one
-        last_mouse_position = current_mouse_position;
-
-        // Invert the horizontal and vertical rotation calculations
+        // Calculate rotations based on the delta
         float rotation_horizontal = -gbl::RAYCASTING::FOV_HORIZONTAL * delta.x / i_window.getSize().x;
         float rotation_vertical = -gbl::RAYCASTING::FOV_VERTICAL * delta.y / i_window.getSize().y;
 
         direction.x = get_degrees(direction.x + rotation_horizontal);
         direction.y = std::clamp<float>(direction.y + rotation_vertical, -gbl::RAYCASTING::MAX_VERTICAL_DIRECTION, gbl::RAYCASTING::MAX_VERTICAL_DIRECTION);
 
-        // Optionally reset mouse position to the center
+        // Center of the window
         unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
         unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
-        sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), i_window);
+        sf::Vector2i window_center(window_center_x, window_center_y);
 
-        // Reset last mouse position to the center after resetting the mouse position
-        last_mouse_position = sf::Mouse::getPosition(i_window);
-    }
-    else
-    {
-        // If the window is not focused, reset the last mouse position to the center
-        unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
-        unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
-        last_mouse_position = sf::Vector2i(window_center_x, window_center_y);
-    }
-}
+        // Reset mouse position to the center if it reaches the edge
+        if (current_mouse_position.x <= 0 || current_mouse_position.x >= i_window.getSize().x - 1 ||
+            current_mouse_position.y <= 0 || current_mouse_position.y >= i_window.getSize().y - 1)
+        {
+            sf::Mouse::setPosition(window_center, i_window);
+            last_mouse_position = window_center; // Update last_mouse_position to the new center
+        }
+        else
+        {
+            last_mouse_position = current_mouse_position; // Update last_mouse_position to the current one
+        }
 
-void Player::handle_movement_events(const sf::Event& event, const gbl::MAP::Map<>& i_map)
-{
-    if (event.type == sf::Event::KeyPressed)
-    {
+        // Key movement
         float step_x = 0;
         float step_y = 0;
 
-        switch (event.key.code)
-        {
-        case sf::Keyboard::A:
+        if (moving_left)
         {
             step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(90 + direction.x));
             step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(90 + direction.x));
-            break;
         }
-        case sf::Keyboard::D:
+        if (moving_right)
         {
             step_x = gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x - 90));
             step_y = -gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x - 90));
-            break;
         }
-        case sf::Keyboard::S:
+        if (moving_backward)
         {
             step_x -= gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
             step_y += gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
-            break;
         }
-        case sf::Keyboard::W:
+        if (moving_forward)
         {
             step_x += gbl::PLAYER::MOVEMENT_SPEED * cos(deg_to_rad(direction.x));
             step_y -= gbl::PLAYER::MOVEMENT_SPEED * sin(deg_to_rad(direction.x));
-            break;
-        }
-        default:
-        {
-            break;
-        }
         }
 
         if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
@@ -202,6 +185,57 @@ void Player::handle_movement_events(const sf::Event& event, const gbl::MAP::Map<
         {
             position.x = round(position.x);
             position.y = round(position.y);
+        }
+    }
+    else
+    {
+        // If the window is not focused, reset the last mouse position to the center
+        unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
+        unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
+        last_mouse_position = sf::Vector2i(window_center_x, window_center_y);
+    }
+}
+
+void Player::handle_movement_events(const sf::Event& event, const gbl::MAP::Map<>& i_map)
+{
+    if (event.type == sf::Event::KeyPressed)
+    {
+        switch (event.key.code)
+        {
+        case sf::Keyboard::A:
+            moving_left = true;
+            break;
+        case sf::Keyboard::D:
+            moving_right = true;
+            break;
+        case sf::Keyboard::S:
+            moving_backward = true;
+            break;
+        case sf::Keyboard::W:
+            moving_forward = true;
+            break;
+        default:
+            break;
+        }
+    }
+    else if (event.type == sf::Event::KeyReleased)
+    {
+        switch (event.key.code)
+        {
+        case sf::Keyboard::A:
+            moving_left = false;
+            break;
+        case sf::Keyboard::D:
+            moving_right = false;
+            break;
+        case sf::Keyboard::S:
+            moving_backward = false;
+            break;
+        case sf::Keyboard::W:
+            moving_forward = false;
+            break;
+        default:
+            break;
         }
     }
 }
