@@ -297,6 +297,7 @@ void Game::handle_events()
 					case sf::Keyboard::Enter:
 					{
 						game_start = 1;
+						window.setMouseCursorVisible(0);
 						break;
 					}
 					default:
@@ -535,11 +536,6 @@ void Game::raycast()
 		}
 		}
 	}
-}
-
-void Game::set_title(const std::string& i_title)
-{
-	window.setTitle(i_title);
 }
 
 void Game::update(float deltaTime)

@@ -19,8 +19,6 @@ int main()
 
     std::chrono::steady_clock::time_point previous_time;
 
-	std::string fps_text = "FPS: 60"; // This should be 30 as it is currently set to 30 (NEED TO CHANGE TO 60)
-
 	Game game;	// main game logic
 	sf::Clock clock;
 
@@ -36,8 +34,6 @@ int main()
 
 		previous_time += delta_time;
 
-		fps_text = "FPS: " + std::to_string(1000000.f / delta_time.count());
-
 		while (gbl::SCREEN::FRAME_DURATION <= lag)
 		{
 			lag -= gbl::SCREEN::FRAME_DURATION;
@@ -49,7 +45,6 @@ int main()
 			if (gbl::SCREEN::FRAME_DURATION > lag)
 			{
 				game.draw();
-				game.set_title(fps_text);
 			}
 		}
 	}

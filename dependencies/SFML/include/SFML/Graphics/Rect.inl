@@ -26,10 +26,10 @@
 ////////////////////////////////////////////////////////////
 template <typename T>
 Rect<T>::Rect() :
-left  (0),
-top   (0),
-width (0),
-height(0)
+    left(0),
+    top(0),
+    width(0),
+    height(0)
 {
 
 }
@@ -38,10 +38,10 @@ height(0)
 ////////////////////////////////////////////////////////////
 template <typename T>
 Rect<T>::Rect(T rectLeft, T rectTop, T rectWidth, T rectHeight) :
-left  (rectLeft),
-top   (rectTop),
-width (rectWidth),
-height(rectHeight)
+    left(rectLeft),
+    top(rectTop),
+    width(rectWidth),
+    height(rectHeight)
 {
 
 }
@@ -50,10 +50,10 @@ height(rectHeight)
 ////////////////////////////////////////////////////////////
 template <typename T>
 Rect<T>::Rect(const Vector2<T>& position, const Vector2<T>& size) :
-left  (position.x),
-top   (position.y),
-width (size.x),
-height(size.y)
+    left(position.x),
+    top(position.y),
+    width(size.x),
+    height(size.y)
 {
 
 }
@@ -63,10 +63,10 @@ height(size.y)
 template <typename T>
 template <typename U>
 Rect<T>::Rect(const Rect<U>& rectangle) :
-left  (static_cast<T>(rectangle.left)),
-top   (static_cast<T>(rectangle.top)),
-width (static_cast<T>(rectangle.width)),
-height(static_cast<T>(rectangle.height))
+    left(static_cast<T>(rectangle.left)),
+    top(static_cast<T>(rectangle.top)),
+    width(static_cast<T>(rectangle.width)),
+    height(static_cast<T>(rectangle.height))
 {
 }
 
@@ -123,9 +123,9 @@ bool Rect<T>::intersects(const Rect<T>& rectangle, Rect<T>& intersection) const
     T r2MaxY = std::max(rectangle.top, static_cast<T>(rectangle.top + rectangle.height));
 
     // Compute the intersection boundaries
-    T interLeft   = std::max(r1MinX, r2MinX);
-    T interTop    = std::max(r1MinY, r2MinY);
-    T interRight  = std::min(r1MaxX, r2MaxX);
+    T interLeft = std::max(r1MinX, r2MinX);
+    T interTop = std::max(r1MinY, r2MinY);
+    T interRight = std::min(r1MaxX, r2MaxX);
     T interBottom = std::min(r1MaxY, r2MaxY);
 
     // If the intersection is valid (positive non zero area), then there is an intersection
@@ -159,7 +159,7 @@ template <typename T>
 inline bool operator ==(const Rect<T>& left, const Rect<T>& right)
 {
     return (left.left == right.left) && (left.width == right.width) &&
-           (left.top == right.top) && (left.height == right.height);
+        (left.top == right.top) && (left.height == right.height);
 }
 
 

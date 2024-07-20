@@ -3,8 +3,6 @@
 #include <iostream>
 #ifdef __APPLE__
 #include <ApplicationServices/ApplicationServices.h> // For macOS
-#elif defined(_WIN32)
-#include <windows.h> // For Windows
 #endif
 #include <SFML/Graphics.hpp>
 
@@ -124,15 +122,20 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
         deltaX = static_cast<float>(macDeltaX);
         deltaY = static_cast<float>(macDeltaY);
 #elif defined(_WIN32)
-        // Get the mouse delta for Windows
-        POINT mousePos;
-        static POINT lastMousePos = { 0, 0 };
-        GetCursorPos(&mousePos);
+        // Get the mouse delta for Windows using SFML functions
+        static sf::Vector2i lastMousePosition = sf::Mouse::getPosition(i_window);
+        sf::Vector2i currentMousePosition = sf::Mouse::getPosition(i_window);
 
-        deltaX = static_cast<float>(mousePos.x - lastMousePos.x);
-        deltaY = static_cast<float>(mousePos.y - lastMousePos.y);
+        // Center of the window
+        unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * i_window.getSize().x));
+        unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * i_window.getSize().y));
+        sf::Vector2i window_center(window_center_x, window_center_y);
 
-        lastMousePos = mousePos;
+        deltaX = static_cast<float>(currentMousePosition.x - window_center.x);
+        deltaY = static_cast<float>(currentMousePosition.y - window_center.y);
+
+        // Reset mouse position to the center
+        sf::Mouse::setPosition(window_center, i_window);
 #endif
 
         // Calculate rotations based on the delta
