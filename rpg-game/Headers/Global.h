@@ -69,8 +69,6 @@ namespace gbl
 		constexpr unsigned short HEIGHT = 360;
 		constexpr unsigned short WIDTH = 640;
 
-		//constexpr std::chrono::microseconds FRAME_DURATION(33334);	// 30 fps
-		//constexpr std::chrono::microseconds FRAME_DURATION(25000); // 40 FPS
 		constexpr std::chrono::microseconds FRAME_DURATION(16667); // 60 FPS
 	}
 
