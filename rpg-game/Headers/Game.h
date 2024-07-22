@@ -8,6 +8,7 @@
 
 class Game
 {
+private:
 	bool show_map;
 	bool game_start;
 
@@ -22,7 +23,10 @@ class Game
 	sf::VertexArray fov_visualization;
 
 	sf::RectangleShape rectangle;
+	sf::RectangleShape startButton;
 
+	sf::Texture startScreenTexture;
+	sf::Sprite startScreenSprite;
 	SpriteManager sprite_manager;
 
 	Player player;
@@ -35,6 +39,7 @@ public:
 	Game();
 	bool is_open() const;
 	void calculate_fov_visualization();
+	void Initialise();
 	void draw();
 	void draw_map();
 	void handle_events();

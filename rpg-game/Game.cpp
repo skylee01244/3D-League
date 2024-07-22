@@ -54,22 +54,27 @@ void Game::calculate_fov_visualization()
 	}
 }
 
+void Game::Initialise()
+{
+	//if (!startScreenTexture.loadFromFile("StartScreen")) {
+	//	std::cerr << "Error loading Start Screen texture" << std::endl;
+	//}
+	//else {
+	//	startScreenSprite.setTexture(startScreenTexture);
+	//}
+
+	//// Load the texture and sprite data into the SpriteManager
+	//sprite_manager.load_texture(0, "StartScreen");
+}
+
 void Game::draw()
 {
 	if (game_start == 0) {
-		//std::cout << "Start screen is set" << std::endl;
-		sf::Texture texture;
-		if (!texture.loadFromFile("Resources/Images/StartScreen.png"))
-		{
-			std::cout << "Error in loading Start Screen" << std::endl;
-		}
-		else
-		{
-			texture.loadFromFile("Resources/Images/StartScreen.png");
-		}
-		rectangle.setSize(sf::Vector2f(640.f, 360.f));
-		rectangle.setTexture(&texture);
-		window.draw(rectangle);
+		sf::Vector2<short> position(0, 0); 
+		sf::Color color = sf::Color::White;  // (no tint)
+		auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
+		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+		sprite_manager.draw_sprite(0, "StartScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
 	}
 	else 
 	{
