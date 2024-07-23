@@ -19,6 +19,7 @@
 Game::Game() :
 	show_map(0),
 	game_start(0),
+	game_end(0),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy(sprite_manager)
@@ -37,6 +38,12 @@ Game::Game() :
 
 	startButton.setSize(sf::Vector2f(85, 125));
 	startButton.setPosition(545, 20);
+
+	quitButton.setSize(sf::Vector2f(110, 60));
+	quitButton.setPosition(180, 235);
+
+	restartButton.setSize(sf::Vector2f(110, 60));
+	restartButton.setPosition(350, 235);
 }
 
 bool Game::is_open() const
@@ -57,21 +64,41 @@ void Game::calculate_fov_visualization()
 	}
 }
 
-	void Game::draw()
-	{
-		if (game_start == 0) {
-			sf::Vector2<short> position(0, 0); 
-			sf::Color color = sf::Color::White;  // (no tint)
-			auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
-			sf::Rect<unsigned short> textureBox = spriteData.texture_box;
-			sprite_manager.draw_sprite(0, "StartScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+void Game::draw()
+{
+	if (game_start == 0) {
+		sf::Vector2<short> position(0, 0); 
+		sf::Color color = sf::Color::White;  // (no tint)
+		auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
+		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+		sprite_manager.draw_sprite(0, "StartScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
 
-			// Draw the Start button
-			auto& buttonSpriteData = sprite_manager.get_sprite_data("StartButton");
-			sf::Vector2<short> buttonPosition(545, 20);
-			sf::Rect<unsigned short> buttonTextureBox = buttonSpriteData.texture_box;
-			sprite_manager.draw_sprite(0, "StartButton", buttonPosition, window, false, false, 1.0f, 1.0f, color, buttonTextureBox);
-		}
+		// Start button
+		auto& startButtonSpriteData = sprite_manager.get_sprite_data("StartButton");
+		sf::Vector2<short> startButtonPosition(545, 20);
+		sf::Rect<unsigned short> startButtonTextureBox = startButtonSpriteData.texture_box;
+		sprite_manager.draw_sprite(0, "StartButton", startButtonPosition, window, false, false, 1.0f, 1.0f, color, startButtonTextureBox);
+	}
+	else if (game_end == 1)
+	{
+		sf::Vector2<short> position(0, 0);
+		sf::Color color = sf::Color::White;  // (no tint)
+		auto& spriteData = sprite_manager.get_sprite_data("EndScreen");
+		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+		sprite_manager.draw_sprite(0, "EndScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+
+		// Quit button
+		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
+		sf::Vector2<short> quitButtonPosition(180, 235);
+		sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
+		sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
+
+		// Restart(Play) button
+		auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
+		sf::Vector2<short> restartButtonPosition(350, 235);
+		sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
+		sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
+	}
 	else 
 	{
 		if (0 == enemy.get_screamer())
@@ -178,7 +205,6 @@ void Game::calculate_fov_visualization()
 						if (enemy.get_distance() > decorations[decoration_index].get_distance())
 						{
 							enemy_is_drawn = 1;
-
 							enemy.draw(pitch, window);
 						}
 					}
@@ -193,7 +219,6 @@ void Game::calculate_fov_visualization()
 					if (enemy.get_distance() > stripe.get_distance())
 					{
 						enemy_is_drawn = 1;
-
 						enemy.draw(pitch, window);
 					}
 				}
@@ -208,7 +233,6 @@ void Game::calculate_fov_visualization()
 					if (enemy.get_distance() > decorations[a].get_distance())
 					{
 						enemy_is_drawn = 1;
-
 						enemy.draw(pitch, window);
 					}
 				}
@@ -228,7 +252,9 @@ void Game::calculate_fov_visualization()
 		}
 		else
 		{
-			short screamer_x = 0.5f * (gbl::SCREEN::WIDTH - gbl::ENEMY::SCREAMER_RESIZE * sprite_manager.get_sprite_data("STEVEN_SCREAMER").texture_box.width);
+			game_end = 1;
+			window.setMouseCursorVisible(1);
+			/*short screamer_x = 0.5f * (gbl::SCREEN::WIDTH - gbl::ENEMY::SCREAMER_RESIZE * sprite_manager.get_sprite_data("STEVEN_SCREAMER").texture_box.width);
 			short screamer_y = gbl::ENEMY::SCREAMER_Y;
 
 			screamer_x += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
@@ -236,9 +262,9 @@ void Game::calculate_fov_visualization()
 
 			window.clear();
 
-			sprite_manager.draw_sprite(0, "STEVEN_SCREAMER", sf::Vector2<short>(screamer_x, screamer_y), window, 0, 0, gbl::ENEMY::SCREAMER_RESIZE, gbl::ENEMY::SCREAMER_RESIZE);
+			sprite_manager.draw_sprite(0, "STEVEN_SCREAMER", sf::Vector2<short>(screamer_x, screamer_y), window, 0, 0, gbl::ENEMY::SCREAMER_RESIZE, gbl::ENEMY::SCREAMER_RESIZE);*/
 
-		}
+		}	
 	}
 	window.display();
 }
@@ -302,12 +328,23 @@ void Game::handle_events()
 			}
 			case sf::Event::MouseButtonPressed:
 			{
-				if (event.mouseButton.button == sf::Mouse::Left)
+				if ((event.mouseButton.button == sf::Mouse::Left) && (game_end==0))	// Before the game ends
 				{
 					if (startButton.getGlobalBounds().contains(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
 					{
 						game_start = 1;
 						window.setMouseCursorVisible(0);
+					}
+				}
+				if ((event.mouseButton.button == sf::Mouse::Left) && (game_end == 1))	// After the game ends
+				{
+					if (quitButton.getGlobalBounds().contains(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
+					{
+						window.close();
+					}
+					if (restartButton.getGlobalBounds().contains(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
+					{
+						// Game restart
 					}
 				}
 				break;

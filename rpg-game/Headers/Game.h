@@ -11,6 +11,7 @@ class Game
 private:
 	bool show_map;
 	bool game_start;
+	bool game_end;
 
 	std::array<Stripe, gbl::SCREEN::WIDTH> stripes;
 
@@ -22,8 +23,9 @@ private:
 
 	sf::VertexArray fov_visualization;
 
-	sf::RectangleShape rectangle;
 	sf::RectangleShape startButton;
+	sf::RectangleShape quitButton;
+	sf::RectangleShape restartButton;
 
 	sf::Texture startScreenTexture;
 	sf::Sprite startScreenSprite;
