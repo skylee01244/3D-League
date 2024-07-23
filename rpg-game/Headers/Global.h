@@ -84,12 +84,6 @@ namespace gbl
 		constexpr float MAX_MOVEMENT_SPEED = 6.1f;
 		constexpr float MIN_MOVEMENT_DISTANCE = 4;
 		constexpr float MIN_MOVEMENT_SPEED = 2.5f;
-
-		constexpr short SCREAMER_Y = -64;
-
-		constexpr unsigned char SCREAMER_RESIZE = 16;
-
-		constexpr unsigned short SCREAMER_MAX_OFFSET = 32;
 	}
 
 	template <typename value_type = unsigned short>

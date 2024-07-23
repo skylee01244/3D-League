@@ -20,7 +20,7 @@ Game::Game() :
 	show_map(0),
 	game_start(0),
 	game_end(0),
-	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
+	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy(sprite_manager)
 {
@@ -254,15 +254,7 @@ void Game::draw()
 		{
 			game_end = 1;
 			window.setMouseCursorVisible(1);
-			/*short screamer_x = 0.5f * (gbl::SCREEN::WIDTH - gbl::ENEMY::SCREAMER_RESIZE * sprite_manager.get_sprite_data("STEVEN_SCREAMER").texture_box.width);
-			short screamer_y = gbl::ENEMY::SCREAMER_Y;
 
-			screamer_x += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
-			screamer_y += rand() % (1 + 2 * gbl::ENEMY::SCREAMER_MAX_OFFSET) - gbl::ENEMY::SCREAMER_MAX_OFFSET;
-
-			window.clear();
-
-			sprite_manager.draw_sprite(0, "STEVEN_SCREAMER", sf::Vector2<short>(screamer_x, screamer_y), window, 0, 0, gbl::ENEMY::SCREAMER_RESIZE, gbl::ENEMY::SCREAMER_RESIZE);*/
 
 		}	
 	}
