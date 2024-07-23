@@ -95,9 +95,9 @@ bool finish_collision(const float i_x, const float i_y, const gbl::MAP::Map<>& i
 
 		if (0 <= x && 0 <= y && gbl::MAP::COLUMNS > x && gbl::MAP::ROWS > y)
 		{
-			if (gbl::MAP::Cell::FinishWall != i_map[x][y])
+			if (gbl::MAP::Cell::FinishWall == i_map[x][y])
 			{
-				return 1;
+				return true;
 			}
 		}
 	}

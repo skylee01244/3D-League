@@ -86,10 +86,21 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
             step_y -= gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(deg_to_rad(direction.x));
         }
 
-        if ((0 == finish_collision(step_x + position.x, step_y + position.y, i_map)) || (0 == finish_collision(step_x + position.x, position.y, i_map)) || (0 == finish_collision(position.x, step_y + position.y, i_map)))
+        if (1 == finish_collision(step_x + position.x, step_y + position.y, i_map))
         {
             game_victory = true;
         }
+
+        /*if (finish_collision(step_x + position.x, step_y + position.y, i_map) ||
+            finish_collision(step_x + position.x, position.y, i_map) ||
+            finish_collision(position.x, step_y + position.y, i_map))
+        {
+            game_victory = true;
+            if(finish_collision(step_x + position.x, step_y + position.y, i_map)) { std::cout << "1" << std::endl; }
+            if (finish_collision(step_x + position.x, position.y, i_map)) { std::cout << "2" << std::endl; }
+            if (finish_collision(position.x, step_y + position.y, i_map)) { std::cout << "3" << std::endl; }
+            
+        }*/
 
         if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
         {

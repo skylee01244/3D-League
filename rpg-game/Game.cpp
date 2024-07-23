@@ -21,7 +21,7 @@ Game::Game() :
 	game_start(0),
 	game_end(0),
 	game_victory(0),
-	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
+	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy(sprite_manager)
 {
@@ -89,7 +89,7 @@ void Game::draw()
 		sprite_manager.draw_sprite(0, "EndScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
 
 		// Quit button
-		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
+		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton"); // 1 for Loss
 		sf::Vector2<short> quitButtonPosition(180, 235);
 		sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
 		sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
@@ -109,7 +109,7 @@ void Game::draw()
 		sprite_manager.draw_sprite(0, "VictoryScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
 
 		// Quit button
-		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
+		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton"); // 2 for Victory
 		sf::Vector2<short> quitButtonPosition(180, 235);
 		sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
 		sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
@@ -274,7 +274,6 @@ void Game::draw()
 		else
 		{
 			game_end = 1;
-			window.setMouseCursorVisible(1);
 		}	
 	}
 	window.display();
@@ -595,11 +594,10 @@ void Game::raycast()
 
 void Game::update(float deltaTime)
 {
-	if (game_start == 0)
-	{
-		//make the if button pressed mechanism, game_start = 1
+	if (game_start == 0 || game_victory == 1) {
+		window.setMouseCursorVisible(1);
 	}
-	if (game_start != 0 && game_end == 0)
+	if (game_start != 0 && game_end == 0 && game_victory == 0)
 	{
 		float player_movement_distance;
 
