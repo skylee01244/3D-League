@@ -24,8 +24,6 @@ int main()
 
 	previous_time = std::chrono::steady_clock::now();
 
-	game.Initialise();
-
 	game.draw();
 
 	while (game.is_open())

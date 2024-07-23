@@ -39,7 +39,6 @@ public:
 	Game();
 	bool is_open() const;
 	void calculate_fov_visualization();
-	void Initialise();
 	void draw();
 	void draw_map();
 	void handle_events();

@@ -19,7 +19,7 @@
 Game::Game() :
 	show_map(0),
 	game_start(0),
-	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
+	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy(sprite_manager)
 {
@@ -34,6 +34,9 @@ Game::Game() :
 	{
 		stripe.set_sprite_manager(sprite_manager);
 	}
+
+	startButton.setSize(sf::Vector2f(85, 125));
+	startButton.setPosition(545, 20);
 }
 
 bool Game::is_open() const
@@ -54,28 +57,21 @@ void Game::calculate_fov_visualization()
 	}
 }
 
-void Game::Initialise()
-{
-	//if (!startScreenTexture.loadFromFile("StartScreen")) {
-	//	std::cerr << "Error loading Start Screen texture" << std::endl;
-	//}
-	//else {
-	//	startScreenSprite.setTexture(startScreenTexture);
-	//}
+	void Game::draw()
+	{
+		if (game_start == 0) {
+			sf::Vector2<short> position(0, 0); 
+			sf::Color color = sf::Color::White;  // (no tint)
+			auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
+			sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+			sprite_manager.draw_sprite(0, "StartScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
 
-	//// Load the texture and sprite data into the SpriteManager
-	//sprite_manager.load_texture(0, "StartScreen");
-}
-
-void Game::draw()
-{
-	if (game_start == 0) {
-		sf::Vector2<short> position(0, 0); 
-		sf::Color color = sf::Color::White;  // (no tint)
-		auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
-		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
-		sprite_manager.draw_sprite(0, "StartScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
-	}
+			// Draw the Start button
+			auto& buttonSpriteData = sprite_manager.get_sprite_data("StartButton");
+			sf::Vector2<short> buttonPosition(545, 20);
+			sf::Rect<unsigned short> buttonTextureBox = buttonSpriteData.texture_box;
+			sprite_manager.draw_sprite(0, "StartButton", buttonPosition, window, false, false, 1.0f, 1.0f, color, buttonTextureBox);
+		}
 	else 
 	{
 		if (0 == enemy.get_screamer())
@@ -299,14 +295,20 @@ void Game::handle_events()
 						show_map = 1 - show_map;
 						break;
 					}
-					case sf::Keyboard::Enter:
+					default:
+						break;
+				}
+				break;
+			}
+			case sf::Event::MouseButtonPressed:
+			{
+				if (event.mouseButton.button == sf::Mouse::Left)
+				{
+					if (startButton.getGlobalBounds().contains(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
 					{
 						game_start = 1;
 						window.setMouseCursorVisible(0);
-						break;
 					}
-					default:
-						break;
 				}
 				break;
 			}
@@ -545,6 +547,10 @@ void Game::raycast()
 
 void Game::update(float deltaTime)
 {
+	if (game_start == 0)
+	{
+		//make the if button pressed mechanism, game_start = 1
+	}
 	if (enemy.get_screamer() == 0 && game_start != 0)
 	{
 		float player_movement_distance;
