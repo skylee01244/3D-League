@@ -21,7 +21,7 @@ Game::Game() :
 	game_start(0),
 	game_end(0),
 	game_victory(0),
-	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
+	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy(sprite_manager)
 {
