@@ -1,4 +1,5 @@
 #pragma once
+#include "SpriteManager.h"
 
 class Animation
 {

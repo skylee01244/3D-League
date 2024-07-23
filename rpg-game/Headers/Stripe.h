@@ -1,4 +1,5 @@
 #pragma once
+#include "SpriteManager.h"
 
 class Stripe
 {
@@ -19,6 +20,7 @@ class Stripe
 	std::string sprite_name;
 
 	SpriteManager* sprite_manager;
+
 public:
 	Stripe();
 

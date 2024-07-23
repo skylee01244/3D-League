@@ -5,6 +5,7 @@
 #include "Decoration.h"
 #include "Animation.h"
 #include "Player.h"
+#include "Enemy.h"
 
 class Game
 {
@@ -12,6 +13,7 @@ private:
 	bool show_map;
 	bool game_start;
 	bool game_end;
+	bool game_victory;
 
 	std::array<Stripe, gbl::SCREEN::WIDTH> stripes;
 

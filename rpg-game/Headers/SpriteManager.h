@@ -1,5 +1,7 @@
 #pragma once
 #include "Global.h"
+#include <iostream>
+#include <unordered_map>
 
 class SpriteManager
 {

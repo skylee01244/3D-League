@@ -52,9 +52,9 @@ gbl::MAP::Map<> convert_map_sketch(std::vector<Decoration>& i_decorations, Playe
 			{
 				i_decorations.push_back(Decoration(1, "FIRE_CAULDRON", i_sprite_manager, a, b));
 			}
-			else if (pixel == sf::Color(73, 73, 85))
+			else if (pixel == sf::Color(0, 255, 0))	// Lime Green
 			{
-				output_map[a][b] = gbl::MAP::Cell::SkeletonWall;
+				output_map[a][b] = gbl::MAP::Cell::FinishWall;
 			}
 			else if (pixel == sf::Color(146, 146, 170))
 			{

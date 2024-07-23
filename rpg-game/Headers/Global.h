@@ -30,7 +30,7 @@ namespace gbl
 			Empty,
 			HelpWall,
 			MugWall,
-			SkeletonWall,
+			FinishWall,
 			TextWall,
 			Wall
 		};

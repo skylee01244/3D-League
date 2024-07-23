@@ -13,7 +13,7 @@ public:
 	Player(const float i_x = 0, const float i_y = 0);
 
 	void set_position(const float i_x, const float i_y);
-	void update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map, float deltaTime);
+	void update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map, float deltaTime, bool& game_victory);
 	void handle_movement_events(const sf::Event& event, const gbl::MAP::Map<>& i_map);
 
 	sf::Vector2f get_direction() const;

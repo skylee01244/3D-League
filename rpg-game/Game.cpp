@@ -20,6 +20,7 @@ Game::Game() :
 	show_map(0),
 	game_start(0),
 	game_end(0),
+	game_victory(0),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy(sprite_manager)
@@ -86,6 +87,26 @@ void Game::draw()
 		auto& spriteData = sprite_manager.get_sprite_data("EndScreen");
 		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
 		sprite_manager.draw_sprite(0, "EndScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+
+		// Quit button
+		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
+		sf::Vector2<short> quitButtonPosition(180, 235);
+		sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
+		sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
+
+		// Restart(Play) button
+		auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
+		sf::Vector2<short> restartButtonPosition(350, 235);
+		sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
+		sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
+	}
+	else if (game_victory == 1)
+	{
+		sf::Vector2<short> position(0, 0);
+		sf::Color color = sf::Color::White;  // (no tint)
+		auto& spriteData = sprite_manager.get_sprite_data("VictoryScreen");
+		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+		sprite_manager.draw_sprite(0, "VictoryScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
 
 		// Quit button
 		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
@@ -254,8 +275,6 @@ void Game::draw()
 		{
 			game_end = 1;
 			window.setMouseCursorVisible(1);
-
-
 		}	
 	}
 	window.display();
@@ -328,7 +347,7 @@ void Game::handle_events()
 						window.setMouseCursorVisible(0);
 					}
 				}
-				if ((event.mouseButton.button == sf::Mouse::Left) && (game_end == 1))	// After the game ends
+				if ((event.mouseButton.button == sf::Mouse::Left) && ((game_end == 1) || (game_victory == 1)))	// After the game ends
 				{
 					if (quitButton.getGlobalBounds().contains(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
 					{
@@ -546,9 +565,9 @@ void Game::raycast()
 
 			break;
 		}
-		case gbl::MAP::Cell::SkeletonWall:
+		case gbl::MAP::Cell::FinishWall:
 		{
-			stripes[a].set_sprite_name("SKELETON_WALL");
+			stripes[a].set_sprite_name("FINISH_WALL");
 
 			break;
 		}
@@ -580,13 +599,13 @@ void Game::update(float deltaTime)
 	{
 		//make the if button pressed mechanism, game_start = 1
 	}
-	if (enemy.get_screamer() == 0 && game_start != 0)
+	if (game_start != 0 && game_end == 0)
 	{
 		float player_movement_distance;
 
 		sf::Vector2f player_position = player.get_position();
 
-		player.update(window, map, deltaTime);
+		player.update(window, map, deltaTime, game_victory);
 
 		enemy.update(window, player.get_direction(), player.get_position(), map, deltaTime);
 

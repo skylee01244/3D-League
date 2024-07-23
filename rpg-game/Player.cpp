@@ -10,6 +10,7 @@
 #include "Headers/Global.h"
 #include "Headers/MapCollision.h"
 #include "Headers/Player.h"
+#include "Headers/Game.h"
 
 Player::Player(const float i_x, const float i_y) :
 	direction(0, 0),
@@ -23,7 +24,7 @@ void Player::set_position(const float i_x, const float i_y)
 	position.y = i_y;
 }
 
-void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map, float deltaTime)
+void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map, float deltaTime, bool& game_victory)
 {
     if (i_window.hasFocus())
     {
@@ -83,6 +84,11 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
         {
             step_x += gbl::PLAYER::MOVEMENT_SPEED * deltaTime * cos(deg_to_rad(direction.x));
             step_y -= gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(deg_to_rad(direction.x));
+        }
+
+        if ((0 == finish_collision(step_x + position.x, step_y + position.y, i_map)) || (0 == finish_collision(step_x + position.x, position.y, i_map)) || (0 == finish_collision(position.x, step_y + position.y, i_map)))
+        {
+            game_victory = true;
         }
 
         if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
