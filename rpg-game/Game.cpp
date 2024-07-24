@@ -594,7 +594,7 @@ void Game::raycast()
 
 void Game::update(float deltaTime)
 {
-	if (game_start == 0 || game_victory == 1) {
+	if (game_start == 0 || game_victory == 1 || game_end == 1) {
 		window.setMouseCursorVisible(1);
 	}
 	if (game_start != 0 && game_end == 0 && game_victory == 0)
