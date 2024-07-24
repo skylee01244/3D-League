@@ -122,7 +122,7 @@ void Game::draw()
 	}
 	else 
 	{
-		if (0 == enemy.get_screamer())
+		if (0 == enemy.get_caught())
 		{
 			bool enemy_is_drawn = 0;
 

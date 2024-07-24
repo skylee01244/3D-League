@@ -12,7 +12,7 @@
 
 Enemy::Enemy(SpriteManager& i_sprite_manager, float i_x, float i_y) :
 	in_the_view(0),
-	screamer(0),
+	caught(0),
 	direction(0),
 	distance(0),
 	screen_x(0),
@@ -28,9 +28,9 @@ Enemy::Enemy(SpriteManager& i_sprite_manager, float i_x, float i_y) :
 {
 }
 
-bool Enemy::get_screamer() const
+bool Enemy::get_caught() const
 {
-	return screamer;
+	return caught;
 }
 
 float Enemy::get_direction() const
@@ -148,7 +148,7 @@ void Enemy::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_playe
 
 		if (1 > sqrt(pow(position.x - i_player_position.x, 2) + pow(position.y - i_player_position.y, 2)))
 		{
-			screamer = 1;
+			caught = 1;
 		}
 
 		//Steven moves to the next cell in the A star path.

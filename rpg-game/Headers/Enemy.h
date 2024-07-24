@@ -4,7 +4,7 @@
 class Enemy
 {
 	bool in_the_view;
-	bool screamer;
+	bool caught;
 
 	float direction;
 	float distance;
@@ -35,7 +35,7 @@ class Enemy
 public:
 	Enemy(SpriteManager& i_sprite_manager, const float i_x = 0, const float i_y = 0);
 
-	bool get_screamer() const;
+	bool get_caught() const;
 
 	float get_direction() const;
 	float get_distance() const;
