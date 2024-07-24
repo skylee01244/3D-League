@@ -6,6 +6,7 @@
 #include "Animation.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Teemo.h"
 
 class Game
 {
@@ -35,7 +36,8 @@ private:
 
 	Player player;
 
-	Enemy enemy;
+	Enemy enemy1;
+	Teemo teemo;
 
 	gbl::MAP::Map<> map;
 

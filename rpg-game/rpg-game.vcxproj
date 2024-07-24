@@ -32,6 +32,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Stripe.cpp" />
+    <ClCompile Include="Teemo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Animation.h" />
@@ -47,6 +48,7 @@
     <ClInclude Include="Headers\Player.h" />
     <ClInclude Include="Headers\SpriteManager.h" />
     <ClInclude Include="Headers\Stripe.h" />
+    <ClInclude Include="Headers\Teemo.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

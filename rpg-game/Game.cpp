@@ -15,6 +15,7 @@
 #include "Headers/Enemy.h"
 #include "Headers/ConvertMapSketch.h"
 #include "Headers/Game.h"
+#include "Headers/Teemo.h"
 
 Game::Game() :
 	show_map(0),
@@ -23,14 +24,16 @@ Game::Game() :
 	game_victory(0),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
-	enemy(sprite_manager)
+	enemy1(sprite_manager),
+	teemo(sprite_manager)
 {
 	window.setMouseCursorVisible(1);
 	window.setView(sf::View(sf::FloatRect(0, 0, gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT)));
 
-	map = convert_map_sketch(decorations, player, enemy, sprite_manager);
+	map = convert_map_sketch(decorations, player, enemy1, teemo, sprite_manager);
 
-	enemy.fill_map(map);
+	enemy1.fill_map(map);
+	teemo.fill_map(map);
 
 	for (Stripe& stripe : stripes)
 	{
@@ -122,13 +125,11 @@ void Game::draw()
 	}
 	else 
 	{
-		if (0 == enemy.get_caught())
+		if (0 == enemy1.get_caught() && 0 == teemo.get_caught())
 		{
-			bool enemy_is_drawn = 0;
+			bool enemy1_is_drawn = 0;
+			bool teemo_is_drawn = 0;
 
-			//I believe that by changing this, you can change your height in the game.
-			//You can use that if you wanna add jumping or crouching.
-			float camera_z = 0.5f * gbl::SCREEN::HEIGHT;
 			float end_stripe_x = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
 			float ray_direction_end_x;
 			float ray_direction_end_y;
@@ -147,8 +148,6 @@ void Game::draw()
 			sf::Image floor_image;
 			floor_image.loadFromFile(floor_sprite_data.image_location);
 
-			//We're gonna draw the floor in this buffer image because the floor is drawn pixel by pixel.
-			//I tried drawing directly on the screen. I stopped when my PC started cooking eggs.
 			sf::Image floor_buffer_image;
 			floor_buffer_image.create(gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT - floor_start_y);
 
@@ -178,7 +177,7 @@ void Game::draw()
 				unsigned char shade;
 
 				//Distance from the player to the current row we're drawing.
-				row_distance = (0 == row_y) ? std::numeric_limits<float>::max() : camera_z / (row_y * vertical_fov_ratio);
+				row_distance = (0 == row_y) ? std::numeric_limits<float>::max() : 0.5f * gbl::SCREEN::HEIGHT / (row_y * vertical_fov_ratio);
 
 				shade = 255 * std::clamp<float>(1 - row_distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
 
@@ -221,51 +220,75 @@ void Game::draw()
 			{
 				while (decoration_index < decorations.size() && stripe.get_distance() < decorations[decoration_index].get_distance())
 				{
-					if (0 == enemy_is_drawn)
+					if (0 == enemy1_is_drawn)
 					{
-						if (enemy.get_distance() > decorations[decoration_index].get_distance())
+						if (enemy1.get_distance() > decorations[decoration_index].get_distance())
 						{
-							enemy_is_drawn = 1;
-							enemy.draw(pitch, window);
+							enemy1_is_drawn = 1;
+							enemy1.draw(pitch, window);
 						}
 					}
-
+					if (0 == teemo_is_drawn)
+					{
+						if (teemo.get_distance() > decorations[decoration_index].get_distance())
+						{
+							teemo_is_drawn = 1;
+							teemo.draw(pitch, window);
+						}
+					}
 					decorations[decoration_index].draw(pitch, window);
 
 					decoration_index++;
 				}
 
-				if (0 == enemy_is_drawn)
+				if (0 == enemy1_is_drawn)
 				{
-					if (enemy.get_distance() > stripe.get_distance())
+					if (enemy1.get_distance() > stripe.get_distance())
 					{
-						enemy_is_drawn = 1;
-						enemy.draw(pitch, window);
+						enemy1_is_drawn = 1;
+						enemy1.draw(pitch, window);
 					}
 				}
-
+				if (0 == teemo_is_drawn)
+				{
+					if (teemo.get_distance() > stripe.get_distance())
+					{
+						teemo_is_drawn = 1;
+						teemo.draw(pitch, window);
+					}
+				}
 				stripe.draw(pitch, window);
 			}
 
 			for (unsigned short a = decoration_index; a < decorations.size(); a++)
 			{
-				if (0 == enemy_is_drawn)
+				if (0 == enemy1_is_drawn)
 				{
-					if (enemy.get_distance() > decorations[a].get_distance())
+					if (enemy1.get_distance() > decorations[a].get_distance())
 					{
-						enemy_is_drawn = 1;
-						enemy.draw(pitch, window);
+						enemy1_is_drawn = 1;
+						enemy1.draw(pitch, window);
 					}
 				}
-
+				if (0 == teemo_is_drawn)
+				{
+					if (teemo.get_distance() > decorations[decoration_index].get_distance())
+					{
+						teemo_is_drawn = 1;
+						teemo.draw(pitch, window);
+					}
+				}
 				decorations[a].draw(pitch, window);
 			}
 
-			if (0 == enemy_is_drawn)
+			if (0 == enemy1_is_drawn)
 			{
-				enemy.draw(pitch, window);
+				enemy1.draw(pitch, window);
 			}
-
+			if (0 == teemo_is_drawn)
+			{
+				teemo.draw(pitch, window);
+			}
 			if (1 == show_map)
 			{
 				draw_map();
@@ -283,7 +306,8 @@ void Game::draw_map()
 {
 	float frame_angle = 360.f / sprite_manager.get_sprite_data("MAP_PLAYER").total_frames;
 	float shifted_direction = get_degrees(player.get_direction().x + 0.5f * frame_angle);
-	float enemy_shifted_direction = get_degrees(enemy.get_direction() + 0.5f * frame_angle);
+	float enemy1_shifted_direction = get_degrees(enemy1.get_direction() + 0.5f * frame_angle);
+	float enemy2_shifted_direction = get_degrees(teemo.get_direction() + 0.5f * frame_angle);
 
 	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
@@ -307,7 +331,8 @@ void Game::draw_map()
 
 	window.draw(fov_visualization);
 
-	sprite_manager.draw_sprite(floor(enemy_shifted_direction / frame_angle), "MAP_STEVEN", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * enemy.get_position().x), round(gbl::MAP::CELL_SIZE * enemy.get_position().y)), window);
+	sprite_manager.draw_sprite(floor(enemy1_shifted_direction / frame_angle), "MAP_STEVEN", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * enemy1.get_position().x), round(gbl::MAP::CELL_SIZE * enemy1.get_position().y)), window);
+	sprite_manager.draw_sprite(floor(enemy2_shifted_direction / frame_angle), "MAP_STEVEN", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * teemo.get_position().x), round(gbl::MAP::CELL_SIZE * teemo.get_position().y)), window);
 	sprite_manager.draw_sprite(floor(shifted_direction / frame_angle), "MAP_PLAYER", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * player.get_position().x), round(gbl::MAP::CELL_SIZE * player.get_position().y)), window);
 }
 
@@ -605,7 +630,9 @@ void Game::update(float deltaTime)
 
 		player.update(window, map, deltaTime, game_victory);
 
-		enemy.update(window, player.get_direction(), player.get_position(), map, deltaTime);
+		enemy1.update(window, player.get_direction(), player.get_position(), map, deltaTime);
+
+		teemo.update(window, player.get_direction(), player.get_position(), map, deltaTime);
 
 		player_movement_distance = sqrt(pow(player_position.x - player.get_position().x, 2) + pow(player_position.y - player.get_position().y, 2));
 

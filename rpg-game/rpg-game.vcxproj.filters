@@ -54,6 +54,9 @@
     <ClCompile Include="Stripe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Teemo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Global.h">
@@ -93,6 +96,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\Stripe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Teemo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
