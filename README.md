@@ -6,8 +6,8 @@ How To Build:
 3) Build using CMake
 > For a multi-configuration generator (Windows)
 ```
-cmake ..
-cmake --build . --config Release
+cmake -S . -B build
+cmake --build build --config Release
 ```
 > For a single-configuration generator (LINUX & MACOS)
 ```
