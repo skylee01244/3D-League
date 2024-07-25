@@ -10,6 +10,7 @@
 #include "Headers/Game.h"
 #include "Headers/Player.h"
 #include "Headers/ConvertMapSketch.h"
+#include "Headers/Teemo.h"
 
 int main()
 {
