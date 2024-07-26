@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Animation.h" />
+    <ClInclude Include="Headers\GameState.h" />
     <ClInclude Include="Headers\GetCell.h" />
     <ClInclude Include="Headers\Decoration.h" />
     <ClInclude Include="Headers\Astar.h" />

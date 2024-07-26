@@ -16,27 +16,36 @@
 #include "Headers/ConvertMapSketch.h"
 #include "Headers/Game.h"
 #include "Headers/Teemo.h"
+#include "Headers/GameState.h"
+
 
 Game::Game() :
 	show_map(0),
-	game_start(0),
-	game_end(0),
-	game_victory(0),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	enemy1(sprite_manager),
-	teemo(sprite_manager)
+	teemo(sprite_manager),
+	game_state(GameState::GAME_START)
 {
+	initialise();
+}
+
+void Game::initialise() {
+	game_state = GameState::GAME_START;
+	show_map = false;
+
 	window.setMouseCursorVisible(1);
 	window.setView(sf::View(sf::FloatRect(0, 0, gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT)));
 
-	map = convert_map_sketch(decorations, player, enemy1, teemo, sprite_manager);
+	player = Player();
+	enemy1 = Enemy(sprite_manager);
+	teemo = Teemo(sprite_manager);
 
+	map = convert_map_sketch(decorations, player, enemy1, teemo, sprite_manager);
 	enemy1.fill_map(map);
 	teemo.fill_map(map);
 
-	for (Stripe& stripe : stripes)
-	{
+	for (Stripe& stripe : stripes) {
 		stripe.set_sprite_manager(sprite_manager);
 	}
 
@@ -48,6 +57,11 @@ Game::Game() :
 
 	restartButton.setSize(sf::Vector2f(110, 60));
 	restartButton.setPosition(350, 235);
+}
+
+void Game::restart()
+{
+	initialise();
 }
 
 bool Game::is_open() const
@@ -68,203 +82,177 @@ void Game::calculate_fov_visualization()
 	}
 }
 
-void Game::draw()
-{
-	if (game_start == 0) {
-		sf::Vector2<short> position(0, 0); 
-		sf::Color color = sf::Color::White;  // (no tint)
-		auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
-		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
-		sprite_manager.draw_sprite(0, "StartScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
-
-		// Start button
-		auto& startButtonSpriteData = sprite_manager.get_sprite_data("StartButton");
-		sf::Vector2<short> startButtonPosition(545, 20);
-		sf::Rect<unsigned short> startButtonTextureBox = startButtonSpriteData.texture_box;
-		sprite_manager.draw_sprite(0, "StartButton", startButtonPosition, window, false, false, 1.0f, 1.0f, color, startButtonTextureBox);
+void Game::draw() {
+	switch (game_state) {
+	case GameState::GAME_START:
+		draw_start_screen();
+		break;
+	case GameState::GAME_PLAYING:
+		draw_gameplay();
+		break;
+	case GameState::GAME_END:
+		draw_end_screen();
+		break;
+	case GameState::GAME_VICTORY:
+		draw_victory_screen();
+		break;
 	}
-	else if (game_end == 1)
+	window.display();
+}
+
+void Game::draw_start_screen() {
+	sf::Vector2<short> position(0, 0);
+	sf::Color color = sf::Color::White;
+	auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
+	sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+	sprite_manager.draw_sprite(0, "StartScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+
+	// Start button
+	auto& startButtonSpriteData = sprite_manager.get_sprite_data("StartButton");
+	sf::Vector2<short> startButtonPosition(545, 20);
+	sf::Rect<unsigned short> startButtonTextureBox = startButtonSpriteData.texture_box;
+	sprite_manager.draw_sprite(0, "StartButton", startButtonPosition, window, false, false, 1.0f, 1.0f, color, startButtonTextureBox);
+}
+
+void Game::draw_end_screen() {
+	sf::Vector2<short> position(0, 0);
+	sf::Color color = sf::Color::White;
+	auto& spriteData = sprite_manager.get_sprite_data("EndScreen");
+	sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+	sprite_manager.draw_sprite(0, "EndScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+
+	// Quit button
+	auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
+	sf::Vector2<short> quitButtonPosition(180, 235);
+	sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
+	sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
+
+	// Restart button
+	auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
+	sf::Vector2<short> restartButtonPosition(350, 235);
+	sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
+	sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
+}
+
+void Game::draw_victory_screen() {
+	sf::Vector2<short> position(0, 0);
+	sf::Color color = sf::Color::White;
+	auto& spriteData = sprite_manager.get_sprite_data("VictoryScreen");
+	sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+	sprite_manager.draw_sprite(0, "VictoryScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+
+	// Quit button
+	auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
+	sf::Vector2<short> quitButtonPosition(180, 235);
+	sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
+	sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
+
+	// Restart button
+	auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
+	sf::Vector2<short> restartButtonPosition(350, 235);
+	sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
+	sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
+}
+
+void Game::draw_gameplay() {
+	if (0 == enemy1.get_caught() && 0 == teemo.get_caught())
 	{
-		sf::Vector2<short> position(0, 0);
-		sf::Color color = sf::Color::White;  // (no tint)
-		auto& spriteData = sprite_manager.get_sprite_data("EndScreen");
-		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
-		sprite_manager.draw_sprite(0, "EndScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+		bool enemy1_is_drawn = 0;
+		bool teemo_is_drawn = 0;
 
-		// Quit button
-		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton"); // 1 for Loss
-		sf::Vector2<short> quitButtonPosition(180, 235);
-		sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
-		sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
+		float end_stripe_x = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
+		float ray_direction_end_x;
+		float ray_direction_end_y;
+		float ray_direction_start_x;
+		float ray_direction_start_y;
+		float start_stripe_x = -tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
+		float vertical_fov_ratio = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
 
-		// Restart(Play) button
-		auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
-		sf::Vector2<short> restartButtonPosition(350, 235);
-		sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
-		sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
-	}
-	else if (game_victory == 1)
-	{
-		sf::Vector2<short> position(0, 0);
-		sf::Color color = sf::Color::White;  // (no tint)
-		auto& spriteData = sprite_manager.get_sprite_data("VictoryScreen");
-		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
-		sprite_manager.draw_sprite(0, "VictoryScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+		short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(deg_to_rad(player.get_direction().y)));
 
-		// Quit button
-		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton"); // 2 for Victory
-		sf::Vector2<short> quitButtonPosition(180, 235);
-		sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
-		sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
+		unsigned short decoration_index = 0;
+		unsigned short floor_start_y = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
 
-		// Restart(Play) button
-		auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
-		sf::Vector2<short> restartButtonPosition(350, 235);
-		sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
-		sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
-	}
-	else 
-	{
-		if (0 == enemy1.get_caught() && 0 == teemo.get_caught())
+		gbl::SpriteData floor_sprite_data = sprite_manager.get_sprite_data("FLOOR");
+
+		sf::Image floor_image;
+		floor_image.loadFromFile(floor_sprite_data.image_location);
+
+		sf::Image floor_buffer_image;
+		floor_buffer_image.create(gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT - floor_start_y);
+
+		sf::Sprite floor_sprite;
+		floor_sprite.setPosition(0, floor_start_y);
+
+		sf::Texture floor_texture;
+
+		ray_direction_end_x = cos(deg_to_rad(player.get_direction().x)) + end_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
+		ray_direction_end_y = -sin(deg_to_rad(player.get_direction().x)) - end_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
+		ray_direction_start_x = cos(deg_to_rad(player.get_direction().x)) + start_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
+		ray_direction_start_y = -sin(deg_to_rad(player.get_direction().x)) - start_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
+
+		window.clear();
+
+		for (unsigned short a = floor_start_y; a < gbl::SCREEN::HEIGHT; a++)
 		{
-			bool enemy1_is_drawn = 0;
-			bool teemo_is_drawn = 0;
+			float floor_step_x;
+			float floor_step_y;
+			double floor_x;
+			double floor_y;
+			float row_distance;
 
-			float end_stripe_x = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
-			float ray_direction_end_x;
-			float ray_direction_end_y;
-			float ray_direction_start_x;
-			float ray_direction_start_y;
-			float start_stripe_x = -tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
-			float vertical_fov_ratio = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
+			//We're drawing the floor row by row from top to bottom.
+			short row_y = a - pitch - 0.5f * gbl::SCREEN::HEIGHT;
 
-			short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(deg_to_rad(player.get_direction().y)));
+			unsigned char shade;
 
-			unsigned short decoration_index = 0;
-			unsigned short floor_start_y = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
+			//Distance from the player to the current row we're drawing.
+			row_distance = (0 == row_y) ? std::numeric_limits<float>::max() : 0.5f * gbl::SCREEN::HEIGHT / (row_y * vertical_fov_ratio);
 
-			gbl::SpriteData floor_sprite_data = sprite_manager.get_sprite_data("FLOOR");
+			shade = 255 * std::clamp<float>(1 - row_distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
 
-			sf::Image floor_image;
-			floor_image.loadFromFile(floor_sprite_data.image_location);
-
-			sf::Image floor_buffer_image;
-			floor_buffer_image.create(gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT - floor_start_y);
-
-			sf::Sprite floor_sprite;
-			floor_sprite.setPosition(0, floor_start_y);
-
-			sf::Texture floor_texture;
-
-			ray_direction_end_x = cos(deg_to_rad(player.get_direction().x)) + end_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
-			ray_direction_end_y = -sin(deg_to_rad(player.get_direction().x)) - end_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
-			ray_direction_start_x = cos(deg_to_rad(player.get_direction().x)) + start_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
-			ray_direction_start_y = -sin(deg_to_rad(player.get_direction().x)) - start_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
-
-			window.clear();
-
-			for (unsigned short a = floor_start_y; a < gbl::SCREEN::HEIGHT; a++)
+			if (0 < shade)
 			{
-				float floor_step_x;
-				float floor_step_y;
-				double floor_x;
-				double floor_y;
-				float row_distance;
+				floor_step_x = row_distance * (ray_direction_end_x - ray_direction_start_x) / gbl::SCREEN::WIDTH;
+				floor_step_y = row_distance * (ray_direction_end_y - ray_direction_start_y) / gbl::SCREEN::WIDTH;
+				//You can get the position of the current floor cell we're drawing using these variables (floor(floor_x) and floor(floor_y)).
+				//Then you'll be able to draw different floor textures.
+				floor_x = 0.5f + player.get_position().x + ray_direction_start_x * row_distance;
+				floor_y = 0.5f + player.get_position().y + ray_direction_start_y * row_distance;
 
-				//We're drawing the floor row by row from top to bottom.
-				short row_y = a - pitch - 0.5f * gbl::SCREEN::HEIGHT;
-
-				unsigned char shade;
-
-				//Distance from the player to the current row we're drawing.
-				row_distance = (0 == row_y) ? std::numeric_limits<float>::max() : 0.5f * gbl::SCREEN::HEIGHT / (row_y * vertical_fov_ratio);
-
-				shade = 255 * std::clamp<float>(1 - row_distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
-
-				if (0 < shade)
+				for (unsigned short b = 0; b < gbl::SCREEN::WIDTH; b++)
 				{
-					floor_step_x = row_distance * (ray_direction_end_x - ray_direction_start_x) / gbl::SCREEN::WIDTH;
-					floor_step_y = row_distance * (ray_direction_end_y - ray_direction_start_y) / gbl::SCREEN::WIDTH;
-					//You can get the position of the current floor cell we're drawing using these variables (floor(floor_x) and floor(floor_y)).
-					//Then you'll be able to draw different floor textures.
-					floor_x = 0.5f + player.get_position().x + ray_direction_start_x * row_distance;
-					floor_y = 0.5f + player.get_position().y + ray_direction_start_y * row_distance;
+					sf::Color floor_image_pixel = floor_image.getPixel(floor(floor_sprite_data.texture_box.width * (5 + floor_x - floor(floor_x))), floor(floor_sprite_data.texture_box.height * (floor_y - floor(floor_y))));
 
-					for (unsigned short b = 0; b < gbl::SCREEN::WIDTH; b++)
-					{
-						sf::Color floor_image_pixel = floor_image.getPixel(floor(floor_sprite_data.texture_box.width * (5 + floor_x - floor(floor_x))), floor(floor_sprite_data.texture_box.height * (floor_y - floor(floor_y))));
+					floor_x += floor_step_x;
+					floor_y += floor_step_y;
 
-						floor_x += floor_step_x;
-						floor_y += floor_step_y;
+					floor_image_pixel *= sf::Color(shade, shade, shade);
 
-						floor_image_pixel *= sf::Color(shade, shade, shade);
-
-						floor_buffer_image.setPixel(b, a - floor_start_y, floor_image_pixel);
-					}
+					floor_buffer_image.setPixel(b, a - floor_start_y, floor_image_pixel);
 				}
 			}
+		}
 
-			floor_texture.loadFromImage(floor_buffer_image);
+		floor_texture.loadFromImage(floor_buffer_image);
 
-			floor_sprite.setTexture(floor_texture);
+		floor_sprite.setTexture(floor_texture);
 
-			window.draw(floor_sprite);
+		window.draw(floor_sprite);
 
-			calculate_fov_visualization();
+		calculate_fov_visualization();
 
-			std::sort(decorations.begin(), decorations.end(), std::greater());
-			std::sort(stripes.begin(), stripes.end(), std::greater());
+		std::sort(decorations.begin(), decorations.end(), std::greater());
+		std::sort(stripes.begin(), stripes.end(), std::greater());
 
-			//Drawing things layer by layer.
-			for (Stripe& stripe : stripes)
-			{
-				while (decoration_index < decorations.size() && stripe.get_distance() < decorations[decoration_index].get_distance())
-				{
-					if (0 == enemy1_is_drawn)
-					{
-						if (enemy1.get_distance() > decorations[decoration_index].get_distance())
-						{
-							enemy1_is_drawn = 1;
-							enemy1.draw(pitch, window);
-						}
-					}
-					if (0 == teemo_is_drawn)
-					{
-						if (teemo.get_distance() > decorations[decoration_index].get_distance())
-						{
-							teemo_is_drawn = 1;
-							teemo.draw(pitch, window);
-						}
-					}
-					decorations[decoration_index].draw(pitch, window);
-
-					decoration_index++;
-				}
-
-				if (0 == enemy1_is_drawn)
-				{
-					if (enemy1.get_distance() > stripe.get_distance())
-					{
-						enemy1_is_drawn = 1;
-						enemy1.draw(pitch, window);
-					}
-				}
-				if (0 == teemo_is_drawn)
-				{
-					if (teemo.get_distance() > stripe.get_distance())
-					{
-						teemo_is_drawn = 1;
-						teemo.draw(pitch, window);
-					}
-				}
-				stripe.draw(pitch, window);
-			}
-
-			for (unsigned short a = decoration_index; a < decorations.size(); a++)
+		//Drawing things layer by layer.
+		for (Stripe& stripe : stripes)
+		{
+			while (decoration_index < decorations.size() && stripe.get_distance() < decorations[decoration_index].get_distance())
 			{
 				if (0 == enemy1_is_drawn)
 				{
-					if (enemy1.get_distance() > decorations[a].get_distance())
+					if (enemy1.get_distance() > decorations[decoration_index].get_distance())
 					{
 						enemy1_is_drawn = 1;
 						enemy1.draw(pitch, window);
@@ -278,29 +266,303 @@ void Game::draw()
 						teemo.draw(pitch, window);
 					}
 				}
-				decorations[a].draw(pitch, window);
+				decorations[decoration_index].draw(pitch, window);
+
+				decoration_index++;
 			}
 
 			if (0 == enemy1_is_drawn)
 			{
-				enemy1.draw(pitch, window);
+				if (enemy1.get_distance() > stripe.get_distance())
+				{
+					enemy1_is_drawn = 1;
+					enemy1.draw(pitch, window);
+				}
 			}
 			if (0 == teemo_is_drawn)
 			{
-				teemo.draw(pitch, window);
+				if (teemo.get_distance() > stripe.get_distance())
+				{
+					teemo_is_drawn = 1;
+					teemo.draw(pitch, window);
+				}
 			}
-			if (1 == show_map)
-			{
-				draw_map();
-			}
+			stripe.draw(pitch, window);
 		}
-		else
+
+		for (unsigned short a = decoration_index; a < decorations.size(); a++)
 		{
-			game_end = 1;
-		}	
+			if (0 == enemy1_is_drawn)
+			{
+				if (enemy1.get_distance() > decorations[a].get_distance())
+				{
+					enemy1_is_drawn = 1;
+					enemy1.draw(pitch, window);
+				}
+			}
+			if (0 == teemo_is_drawn)
+			{
+				if (teemo.get_distance() > decorations[decoration_index].get_distance())
+				{
+					teemo_is_drawn = 1;
+					teemo.draw(pitch, window);
+				}
+			}
+			decorations[a].draw(pitch, window);
+		}
+
+		if (0 == enemy1_is_drawn)
+		{
+			enemy1.draw(pitch, window);
+		}
+		if (0 == teemo_is_drawn)
+		{
+			teemo.draw(pitch, window);
+		}
+		if (1 == show_map)
+		{
+			draw_map();
+		}
 	}
-	window.display();
+	else
+	{
+		game_state = GameState::GAME_END;
+	}
 }
+
+//void Game::draw()
+//{
+//	if (game_start == 0) {
+//		sf::Vector2<short> position(0, 0); 
+//		sf::Color color = sf::Color::White;  // (no tint)
+//		auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
+//		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+//		sprite_manager.draw_sprite(0, "StartScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+//
+//		// Start button
+//		auto& startButtonSpriteData = sprite_manager.get_sprite_data("StartButton");
+//		sf::Vector2<short> startButtonPosition(545, 20);
+//		sf::Rect<unsigned short> startButtonTextureBox = startButtonSpriteData.texture_box;
+//		sprite_manager.draw_sprite(0, "StartButton", startButtonPosition, window, false, false, 1.0f, 1.0f, color, startButtonTextureBox);
+//	}
+//	else if (game_end == 1)
+//	{
+//		sf::Vector2<short> position(0, 0);
+//		sf::Color color = sf::Color::White;  // (no tint)
+//		auto& spriteData = sprite_manager.get_sprite_data("EndScreen");
+//		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+//		sprite_manager.draw_sprite(0, "EndScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+//
+//		// Quit button
+//		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton"); // 1 for Loss
+//		sf::Vector2<short> quitButtonPosition(180, 235);
+//		sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
+//		sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
+//
+//		// Restart(Play) button
+//		auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
+//		sf::Vector2<short> restartButtonPosition(350, 235);
+//		sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
+//		sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
+//	}
+//	else if (game_victory == 1)
+//	{
+//		sf::Vector2<short> position(0, 0);
+//		sf::Color color = sf::Color::White;  // (no tint)
+//		auto& spriteData = sprite_manager.get_sprite_data("VictoryScreen");
+//		sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+//		sprite_manager.draw_sprite(0, "VictoryScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
+//
+//		// Quit button
+//		auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton"); // 2 for Victory
+//		sf::Vector2<short> quitButtonPosition(180, 235);
+//		sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
+//		sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
+//
+//		// Restart(Play) button
+//		auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
+//		sf::Vector2<short> restartButtonPosition(350, 235);
+//		sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
+//		sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
+//	}
+//	else 
+//	{
+//		if (0 == enemy1.get_caught() && 0 == teemo.get_caught())
+//		{
+//			bool enemy1_is_drawn = 0;
+//			bool teemo_is_drawn = 0;
+//
+//			float end_stripe_x = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
+//			float ray_direction_end_x;
+//			float ray_direction_end_y;
+//			float ray_direction_start_x;
+//			float ray_direction_start_y;
+//			float start_stripe_x = -tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
+//			float vertical_fov_ratio = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
+//
+//			short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(deg_to_rad(player.get_direction().y)));
+//
+//			unsigned short decoration_index = 0;
+//			unsigned short floor_start_y = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
+//
+//			gbl::SpriteData floor_sprite_data = sprite_manager.get_sprite_data("FLOOR");
+//
+//			sf::Image floor_image;
+//			floor_image.loadFromFile(floor_sprite_data.image_location);
+//
+//			sf::Image floor_buffer_image;
+//			floor_buffer_image.create(gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT - floor_start_y);
+//
+//			sf::Sprite floor_sprite;
+//			floor_sprite.setPosition(0, floor_start_y);
+//
+//			sf::Texture floor_texture;
+//
+//			ray_direction_end_x = cos(deg_to_rad(player.get_direction().x)) + end_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
+//			ray_direction_end_y = -sin(deg_to_rad(player.get_direction().x)) - end_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
+//			ray_direction_start_x = cos(deg_to_rad(player.get_direction().x)) + start_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
+//			ray_direction_start_y = -sin(deg_to_rad(player.get_direction().x)) - start_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
+//
+//			window.clear();
+//
+//			for (unsigned short a = floor_start_y; a < gbl::SCREEN::HEIGHT; a++)
+//			{
+//				float floor_step_x;
+//				float floor_step_y;
+//				double floor_x;
+//				double floor_y;
+//				float row_distance;
+//
+//				//We're drawing the floor row by row from top to bottom.
+//				short row_y = a - pitch - 0.5f * gbl::SCREEN::HEIGHT;
+//
+//				unsigned char shade;
+//
+//				//Distance from the player to the current row we're drawing.
+//				row_distance = (0 == row_y) ? std::numeric_limits<float>::max() : 0.5f * gbl::SCREEN::HEIGHT / (row_y * vertical_fov_ratio);
+//
+//				shade = 255 * std::clamp<float>(1 - row_distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
+//
+//				if (0 < shade)
+//				{
+//					floor_step_x = row_distance * (ray_direction_end_x - ray_direction_start_x) / gbl::SCREEN::WIDTH;
+//					floor_step_y = row_distance * (ray_direction_end_y - ray_direction_start_y) / gbl::SCREEN::WIDTH;
+//					//You can get the position of the current floor cell we're drawing using these variables (floor(floor_x) and floor(floor_y)).
+//					//Then you'll be able to draw different floor textures.
+//					floor_x = 0.5f + player.get_position().x + ray_direction_start_x * row_distance;
+//					floor_y = 0.5f + player.get_position().y + ray_direction_start_y * row_distance;
+//
+//					for (unsigned short b = 0; b < gbl::SCREEN::WIDTH; b++)
+//					{
+//						sf::Color floor_image_pixel = floor_image.getPixel(floor(floor_sprite_data.texture_box.width * (5 + floor_x - floor(floor_x))), floor(floor_sprite_data.texture_box.height * (floor_y - floor(floor_y))));
+//
+//						floor_x += floor_step_x;
+//						floor_y += floor_step_y;
+//
+//						floor_image_pixel *= sf::Color(shade, shade, shade);
+//
+//						floor_buffer_image.setPixel(b, a - floor_start_y, floor_image_pixel);
+//					}
+//				}
+//			}
+//
+//			floor_texture.loadFromImage(floor_buffer_image);
+//
+//			floor_sprite.setTexture(floor_texture);
+//
+//			window.draw(floor_sprite);
+//
+//			calculate_fov_visualization();
+//
+//			std::sort(decorations.begin(), decorations.end(), std::greater());
+//			std::sort(stripes.begin(), stripes.end(), std::greater());
+//
+//			//Drawing things layer by layer.
+//			for (Stripe& stripe : stripes)
+//			{
+//				while (decoration_index < decorations.size() && stripe.get_distance() < decorations[decoration_index].get_distance())
+//				{
+//					if (0 == enemy1_is_drawn)
+//					{
+//						if (enemy1.get_distance() > decorations[decoration_index].get_distance())
+//						{
+//							enemy1_is_drawn = 1;
+//							enemy1.draw(pitch, window);
+//						}
+//					}
+//					if (0 == teemo_is_drawn)
+//					{
+//						if (teemo.get_distance() > decorations[decoration_index].get_distance())
+//						{
+//							teemo_is_drawn = 1;
+//							teemo.draw(pitch, window);
+//						}
+//					}
+//					decorations[decoration_index].draw(pitch, window);
+//
+//					decoration_index++;
+//				}
+//
+//				if (0 == enemy1_is_drawn)
+//				{
+//					if (enemy1.get_distance() > stripe.get_distance())
+//					{
+//						enemy1_is_drawn = 1;
+//						enemy1.draw(pitch, window);
+//					}
+//				}
+//				if (0 == teemo_is_drawn)
+//				{
+//					if (teemo.get_distance() > stripe.get_distance())
+//					{
+//						teemo_is_drawn = 1;
+//						teemo.draw(pitch, window);
+//					}
+//				}
+//				stripe.draw(pitch, window);
+//			}
+//
+//			for (unsigned short a = decoration_index; a < decorations.size(); a++)
+//			{
+//				if (0 == enemy1_is_drawn)
+//				{
+//					if (enemy1.get_distance() > decorations[a].get_distance())
+//					{
+//						enemy1_is_drawn = 1;
+//						enemy1.draw(pitch, window);
+//					}
+//				}
+//				if (0 == teemo_is_drawn)
+//				{
+//					if (teemo.get_distance() > decorations[decoration_index].get_distance())
+//					{
+//						teemo_is_drawn = 1;
+//						teemo.draw(pitch, window);
+//					}
+//				}
+//				decorations[a].draw(pitch, window);
+//			}
+//
+//			if (0 == enemy1_is_drawn)
+//			{
+//				enemy1.draw(pitch, window);
+//			}
+//			if (0 == teemo_is_drawn)
+//			{
+//				teemo.draw(pitch, window);
+//			}
+//			if (1 == show_map)
+//			{
+//				draw_map();
+//			}
+//		}
+//		else
+//		{
+//			game_end = 1;
+//		}	
+//	}
+//	window.display();
+//}
 
 void Game::draw_map()
 {
@@ -363,15 +625,15 @@ void Game::handle_events()
 			}
 			case sf::Event::MouseButtonPressed:
 			{
-				if ((event.mouseButton.button == sf::Mouse::Left) && (game_end==0))	// Before the game ends
+				if ((event.mouseButton.button == sf::Mouse::Left) && (game_state == GameState::GAME_START))
 				{
 					if (startButton.getGlobalBounds().contains(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
 					{
-						game_start = 1;
+						game_state = GameState::GAME_PLAYING;
 						window.setMouseCursorVisible(0);
 					}
 				}
-				if ((event.mouseButton.button == sf::Mouse::Left) && ((game_end == 1) || (game_victory == 1)))	// After the game ends
+				if ((event.mouseButton.button == sf::Mouse::Left) && ((game_state == GameState::GAME_END || game_state == GameState::GAME_VICTORY)))
 				{
 					if (quitButton.getGlobalBounds().contains(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
 					{
@@ -379,7 +641,8 @@ void Game::handle_events()
 					}
 					if (restartButton.getGlobalBounds().contains(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
 					{
-						// Game restart
+						window.setMouseCursorVisible(0);
+						restart();
 					}
 				}
 				break;
@@ -619,16 +882,16 @@ void Game::raycast()
 
 void Game::update(float deltaTime)
 {
-	if (game_start == 0 || game_victory == 1 || game_end == 1) {
-		window.setMouseCursorVisible(1);
+	if (game_state == GameState::GAME_START || game_state == GameState::GAME_VICTORY || game_state == GameState::GAME_END) {
+		window.setMouseCursorVisible(true);
 	}
-	if (game_start != 0 && game_end == 0 && game_victory == 0)
+	if (game_state == GameState::GAME_PLAYING)
 	{
 		float player_movement_distance;
 
 		sf::Vector2f player_position = player.get_position();
 
-		player.update(window, map, deltaTime, game_victory);
+		player.update(window, map, deltaTime, game_state);
 
 		enemy1.update(window, player.get_direction(), player.get_position(), map, deltaTime);
 

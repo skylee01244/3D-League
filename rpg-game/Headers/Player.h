@@ -1,4 +1,5 @@
 #pragma once
+#include "GameState.h"
 
 class Player
 {
@@ -13,7 +14,7 @@ public:
 	Player(const float i_x = 0, const float i_y = 0);
 
 	void set_position(const float i_x, const float i_y);
-	void update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map, float deltaTime, bool& game_victory);
+	void update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map, float deltaTime, GameState& game_state);
 	void handle_movement_events(const sf::Event& event, const gbl::MAP::Map<>& i_map);
 
 	sf::Vector2f get_direction() const;
