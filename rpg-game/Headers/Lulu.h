@@ -1,7 +1,7 @@
 #pragma once
 #include "SpriteManager.h"
 
-class Enemy
+class Lulu
 {
 	bool in_the_view;
 	bool caught;
@@ -33,7 +33,7 @@ class Enemy
 	gbl::MAP::Map<float> astar_h_scores;
 	//----------------< A star algorithm end >----------------
 public:
-	Enemy(SpriteManager& i_sprite_manager, const float i_x = 0, const float i_y = 0);
+	Lulu(SpriteManager& i_sprite_manager, const float i_x = 0, const float i_y = 0);
 
 	bool get_caught() const;
 

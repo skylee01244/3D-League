@@ -5,7 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Headers/AngleFunctions.h"
-#include "Headers/Enemy.h"
+#include "Headers/Lulu.h"
 #include "Headers/Teemo.h"
 #include "Headers/Global.h"
 #include "Headers/Game.h"

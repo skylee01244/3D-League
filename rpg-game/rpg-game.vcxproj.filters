@@ -30,7 +30,7 @@
     <ClCompile Include="MapCollision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Enemy.cpp">
+    <ClCompile Include="Lulu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
@@ -74,7 +74,7 @@
     <ClInclude Include="Headers\MapCollision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\Enemy.h">
+    <ClInclude Include="Headers\Lulu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\Game.h">

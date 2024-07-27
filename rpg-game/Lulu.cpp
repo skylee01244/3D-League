@@ -8,9 +8,9 @@
 #include "Headers/Astar.h"
 #include "Headers/SpriteManager.h"
 #include "Headers/MapCollision.h"
-#include "Headers/Enemy.h"
+#include "Headers/Lulu.h"
 
-Enemy::Enemy(SpriteManager& i_sprite_manager, float i_x, float i_y) :
+Lulu::Lulu(SpriteManager& i_sprite_manager, float i_x, float i_y) :
 	in_the_view(0),
 	caught(0),
 	direction(0),
@@ -28,27 +28,27 @@ Enemy::Enemy(SpriteManager& i_sprite_manager, float i_x, float i_y) :
 {
 }
 
-bool Enemy::get_caught() const
+bool Lulu::get_caught() const
 {
 	return caught;
 }
 
-float Enemy::get_direction() const
+float Lulu::get_direction() const
 {
 	return direction;
 }
 
-float Enemy::get_distance() const
+float Lulu::get_distance() const
 {
 	return distance;
 }
 
-int Enemy::get_height() const
+int Lulu::get_height() const
 {
 	return round(gbl::SCREEN::HEIGHT / (distance * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL))));
 }
 
-int Enemy::get_width() const
+int Lulu::get_width() const
 {
 	float sprite_height = sprite_manager->get_sprite_data("STEVEN").texture_box.height;
 	float sprite_width = sprite_manager->get_sprite_data("STEVEN").texture_box.width;
@@ -56,17 +56,17 @@ int Enemy::get_width() const
 	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 }
 
-int Enemy::get_x() const
+int Lulu::get_x() const
 {
 	return screen_x - round(0.5f * get_width());
 }
 
-int Enemy::get_y() const
+int Lulu::get_y() const
 {
 	return round(0.5f * (gbl::SCREEN::HEIGHT - get_height()));
 }
 
-void Enemy::draw(const short i_pitch, sf::RenderWindow& i_window)
+void Lulu::draw(const short i_pitch, sf::RenderWindow& i_window)
 {
 	float sprite_height = sprite_manager->get_sprite_data("STEVEN").texture_box.height;
 	float sprite_width = sprite_manager->get_sprite_data("STEVEN").texture_box.width;
@@ -81,7 +81,7 @@ void Enemy::draw(const short i_pitch, sf::RenderWindow& i_window)
 	}
 }
 
-void Enemy::fill_map(const gbl::MAP::Map<>& i_map)
+void Lulu::fill_map(const gbl::MAP::Map<>& i_map)
 {
 	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
@@ -99,7 +99,7 @@ void Enemy::fill_map(const gbl::MAP::Map<>& i_map)
 	}
 }
 
-void Enemy::set_position(const float i_x, const float i_y)
+void Lulu::set_position(const float i_x, const float i_y)
 {
 	position.x = i_x;
 	position.y = i_y;
@@ -108,7 +108,7 @@ void Enemy::set_position(const float i_x, const float i_y)
 	next_cell.y = position.y;
 }
 
-void Enemy::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player_direction, const sf::Vector2f& i_player_position, const gbl::MAP::Map<>& i_map, float deltaTime)
+void Lulu::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player_direction, const sf::Vector2f& i_player_position, const gbl::MAP::Map<>& i_map, float deltaTime)
 {
 	if (1 == i_window.hasFocus())
 	{
@@ -210,7 +210,7 @@ void Enemy::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_playe
 	}
 }
 
-sf::Vector2f Enemy::get_position() const
+sf::Vector2f Lulu::get_position() const
 {
 	return position;
 }

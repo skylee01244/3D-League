@@ -5,7 +5,7 @@
 #include "Decoration.h"
 #include "Animation.h"
 #include "Player.h"
-#include "Enemy.h"
+#include "Lulu.h"
 #include "Teemo.h"
 #include "GameState.h"
 
@@ -16,23 +16,17 @@ private:
 	bool show_map;
 
 	std::array<Stripe, gbl::SCREEN::WIDTH> stripes;
-
 	std::vector<Decoration> decorations;
-
 	sf::Event event = sf::Event();
-
 	sf::RenderWindow window;
-
 	sf::VertexArray fov_visualization;
-
 	sf::RectangleShape startButton, quitButton, restartButton;
-
 	sf::Texture startScreenTexture;
 	sf::Sprite startScreenSprite;
-	SpriteManager sprite_manager;
 
+	SpriteManager sprite_manager;
 	Player player;
-	Enemy enemy1;
+	Lulu lulu;
 	Teemo teemo;
 	gbl::MAP::Map<> map;
 

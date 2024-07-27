@@ -24,7 +24,7 @@
     <ClCompile Include="Astar.cpp" />
     <ClCompile Include="ConvertMapSketch.cpp" />
     <ClCompile Include="Decoration.cpp" />
-    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="Lulu.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GetCell.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -41,7 +41,7 @@
     <ClInclude Include="Headers\Decoration.h" />
     <ClInclude Include="Headers\Astar.h" />
     <ClInclude Include="Headers\Game.h" />
-    <ClInclude Include="Headers\Enemy.h" />
+    <ClInclude Include="Headers\Lulu.h" />
     <ClInclude Include="Headers\ConvertMapSketch.h" />
     <ClInclude Include="Headers\AngleFunctions.h" />
     <ClInclude Include="Headers\Global.h" />
