@@ -19,6 +19,11 @@
 #include "Headers/GameState.h"
 
 
+void Game::setFrameRateLimit(unsigned int limit)
+{
+	window.setFramerateLimit(limit);
+}
+
 Game::Game() :
 	show_map(0),
 	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),

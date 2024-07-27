@@ -14,41 +14,21 @@
 
 int main()
 {
-	srand(std::chrono::system_clock::now().time_since_epoch().count()); // Randomising the Seed
 
-	std::chrono::microseconds lag(0);   // make the game framerate-independent
-
-    std::chrono::steady_clock::time_point previous_time;
-
-	Game game;	// main game logic
+	Game game;
 	sf::Clock clock;
 
-	previous_time = std::chrono::steady_clock::now();
+	game.setFrameRateLimit(60);
 
 	game.draw();
 
 	while (game.is_open())
 	{
-		std::chrono::microseconds delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - previous_time);
+		game.handle_events();
 
-		lag += delta_time;
-
-		previous_time += delta_time;
-
-		while (gbl::SCREEN::FRAME_DURATION <= lag)
-		{
-			lag -= gbl::SCREEN::FRAME_DURATION;
-
-			game.handle_events();
-			float deltaTime = clock.restart().asSeconds();
-			game.update(deltaTime);
-
-			if (gbl::SCREEN::FRAME_DURATION > lag)
-			{
-				game.draw();
-			}
-		}
+		float deltaTime = clock.restart().asSeconds();
+		game.update(deltaTime);
+		game.draw();
 	}
-
     return 0;
 }

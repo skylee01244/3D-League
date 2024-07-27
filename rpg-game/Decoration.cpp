@@ -21,7 +21,7 @@ Decoration::Decoration(const bool i_is_animation, const std::string& i_sprite_na
 {
 	if ("FIRE_CAULDRON" == i_sprite_name)
 	{
-		animation.set_animation_speed(gbl::SPRITES::FIRE_ANIMATION_SPEED);
+		animation.set_animation_speed(gbl::SPRITES::ANIMATION_SPEED);
 	}
 }
 

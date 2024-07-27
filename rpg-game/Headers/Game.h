@@ -38,7 +38,7 @@ private:
 
 public:
 	GameState game_state;
-
+	void setFrameRateLimit(unsigned int limit);
 public:
 	Game();
 	void restart();

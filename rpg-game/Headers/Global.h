@@ -74,7 +74,7 @@ namespace gbl
 
 	namespace SPRITES
 	{
-		constexpr float FIRE_ANIMATION_SPEED = 0.5f;
+		constexpr float ANIMATION_SPEED = 0.20f;
 	}
 
 
