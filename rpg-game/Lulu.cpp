@@ -131,19 +131,7 @@ void Lulu::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player
 
 			direction = rad_to_deg(atan2(position.y - next_cell.y, next_cell.x - position.x));
 
-			//The farther Steven is from the player, the faster he moves, and vice versa.
-			if (gbl::ENEMY::MAX_MOVEMENT_DISTANCE < astar_path_length)
-			{
-				speed = gbl::ENEMY::MAX_MOVEMENT_SPEED;
-			}
-			else if (gbl::ENEMY::MIN_MOVEMENT_DISTANCE > astar_path_length)
-			{
-				speed = gbl::ENEMY::MIN_MOVEMENT_SPEED;
-			}
-			else
-			{
-				speed = gbl::ENEMY::MIN_MOVEMENT_SPEED + (gbl::ENEMY::MAX_MOVEMENT_SPEED - gbl::ENEMY::MIN_MOVEMENT_SPEED) * (astar_path_length - gbl::ENEMY::MIN_MOVEMENT_DISTANCE) / (gbl::ENEMY::MAX_MOVEMENT_DISTANCE - gbl::ENEMY::MIN_MOVEMENT_DISTANCE);
-			}
+			speed = gbl::ENEMY::MOVEMENT_SPEED;
 		}
 
 		if (1 > sqrt(pow(position.x - i_player_position.x, 2) + pow(position.y - i_player_position.y, 2)))
