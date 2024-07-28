@@ -50,8 +50,8 @@ int Lulu::get_height() const
 
 int Lulu::get_width() const
 {
-	float sprite_height = sprite_manager->get_sprite_data("STEVEN").texture_box.height;
-	float sprite_width = sprite_manager->get_sprite_data("STEVEN").texture_box.width;
+	float sprite_height = sprite_manager->get_sprite_data("LULU").texture_box.height;
+	float sprite_width = sprite_manager->get_sprite_data("LULU").texture_box.width;
 
 	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 }
@@ -68,8 +68,8 @@ int Lulu::get_y() const
 
 void Lulu::draw(const short i_pitch, sf::RenderWindow& i_window)
 {
-	float sprite_height = sprite_manager->get_sprite_data("STEVEN").texture_box.height;
-	float sprite_width = sprite_manager->get_sprite_data("STEVEN").texture_box.width;
+	float sprite_height = sprite_manager->get_sprite_data("LULU").texture_box.height;
+	float sprite_width = sprite_manager->get_sprite_data("LULU").texture_box.width;
 
 	unsigned char shade = 255 * std::clamp<float>(1 - distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
 
@@ -77,7 +77,7 @@ void Lulu::draw(const short i_pitch, sf::RenderWindow& i_window)
 
 	if (0 < shade && 1 == in_the_view)
 	{
-		sprite_manager->draw_sprite(current_frame, "STEVEN", sf::Vector2<short>(get_x(), i_pitch + get_y()), i_window, 0, 0, get_width() / sprite_width, get_height() / sprite_height, sf::Color(shade, shade, shade));
+		sprite_manager->draw_sprite(current_frame, "LULU", sf::Vector2<short>(get_x(), i_pitch + get_y()), i_window, 0, 0, get_width() / sprite_width, get_height() / sprite_height, sf::Color(shade, shade, shade));
 	}
 }
 
@@ -114,7 +114,7 @@ void Lulu::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player
 	{
 		float angle = get_radians(atan2(i_player_position.y - position.y, position.x - i_player_position.x));
 		float difference = deg_difference(i_player_direction.x, rad_to_deg(angle));
-		float frame_angle = 360.f / sprite_manager->get_sprite_data("STEVEN").total_frames;
+		float frame_angle = 360.f / sprite_manager->get_sprite_data("LULU").total_frames;
 		float shifted_direction;
 		float speed = 0;
 		float step_x = 0;

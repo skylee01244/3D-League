@@ -79,9 +79,9 @@ namespace gbl
 	namespace ENEMY
 	{
 		constexpr float MAX_MOVEMENT_DISTANCE = 32.f;
-		constexpr float MAX_MOVEMENT_SPEED = 2.9f;
+		constexpr float MAX_MOVEMENT_SPEED = 3.2f;
 		constexpr float MIN_MOVEMENT_DISTANCE = 4.f;
-		constexpr float MIN_MOVEMENT_SPEED = 2.5f;
+		constexpr float MIN_MOVEMENT_SPEED = 3.2f;
 	}
 
 	template <typename value_type = unsigned short>

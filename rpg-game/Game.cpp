@@ -26,7 +26,7 @@ void Game::setFrameRateLimit(unsigned int limit)
 
 Game::Game() :
 	show_map(0),
-	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
+	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	lulu(sprite_manager),
 	teemo(sprite_manager),
