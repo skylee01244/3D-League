@@ -59,7 +59,7 @@ short Stripe::get_y() const
 
 unsigned short Stripe::get_height() const
 {
-	return static_cast<unsigned short>(round(gbl::SCREEN::HEIGHT / (distance * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL)))));
+	return static_cast<unsigned short>(round(gbl::SCREEN::HEIGHT / (distance * tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL)))));
 }
 
 unsigned short Stripe::get_side_x() const

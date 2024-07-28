@@ -1,40 +1,37 @@
-#include <array>
-#include <chrono>
+#include <cmath>
 #include <SFML/Graphics.hpp>
 
 #include "Headers/AngleFunctions.h"
 #include "Headers/Global.h"
 
-float deg_difference(const float i_angle_0, const float i_angle_1)
+float PI = 3.141592653589793116f;
+
+float normalize_degrees(float degrees)
 {
-	//This returns an angle between 0 and 180.
-	return 180 - abs(abs(get_degrees(i_angle_0) - get_degrees(i_angle_1)) - 180);
+    return fmod(360.0f + fmod(degrees, 360.0f), 360.0f);
 }
 
-float deg_to_rad(const float i_degrees)
+float normalize_radians(float radians)
 {
-	return gbl::RAYCASTING::PI * get_degrees(i_degrees) / 180;
+    return fmod(2 * PI + fmod(radians, 2 * PI), 2 * PI);
 }
 
-float get_degrees(const float i_degrees)
+float degrees_to_radians(float degrees)
 {
-	//Give this function any angle (in degrees) and it converts it to an angle between 0 and 360.
-	return static_cast<float>(fmod(360 + fmod(i_degrees, 360), 360));
+    return PI * normalize_degrees(degrees) / 180.0f;
 }
 
-float get_radians(const float i_radians)
+float radians_to_degrees(float radians)
 {
-	//Same as above but in radians.
-	return static_cast<float>(fmod(2 * gbl::RAYCASTING::PI + fmod(i_radians, 2 * gbl::RAYCASTING::PI), 2 * gbl::RAYCASTING::PI));
+    return 180.0f * normalize_radians(radians) / PI;
 }
 
-float rad_difference(const float i_angle_0, const float i_angle_1)
+float degrees_difference(float angle1, float angle2)
 {
-	//This returns an angle between 0 and PI (I think, I don't know how radians work).
-	return gbl::RAYCASTING::PI - abs(abs(get_radians(i_angle_0) - get_radians(i_angle_1)) - gbl::RAYCASTING::PI);
+    return 180.0f - fabs(fabs(normalize_degrees(angle1) - normalize_degrees(angle2)) - 180.0f);
 }
 
-float rad_to_deg(const float i_radians)
+float radians_difference(float angle1, float angle2)
 {
-	return 180 * get_radians(i_radians) / gbl::RAYCASTING::PI;
+    return PI - fabs(fabs(normalize_radians(angle1) - normalize_radians(angle2)) - PI);
 }

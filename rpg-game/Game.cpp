@@ -165,15 +165,15 @@ void Game::draw_gameplay() {
 		bool lulu_is_drawn = 0;
 		bool teemo_is_drawn = 0;
 
-		float end_stripe_x = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
+		float end_stripe_x = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
 		float ray_direction_end_x;
 		float ray_direction_end_y;
 		float ray_direction_start_x;
 		float ray_direction_start_y;
-		float start_stripe_x = -tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
-		float vertical_fov_ratio = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
+		float start_stripe_x = -tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
+		float vertical_fov_ratio = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
 
-		short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(deg_to_rad(player.get_direction().y)));
+		short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(degrees_to_radians(player.get_direction().y)));
 
 		unsigned short decoration_index = 0;
 		unsigned short floor_start_y = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
@@ -191,10 +191,10 @@ void Game::draw_gameplay() {
 
 		sf::Texture floor_texture;
 
-		ray_direction_end_x = cos(deg_to_rad(player.get_direction().x)) + end_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
-		ray_direction_end_y = -sin(deg_to_rad(player.get_direction().x)) - end_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
-		ray_direction_start_x = cos(deg_to_rad(player.get_direction().x)) + start_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
-		ray_direction_start_y = -sin(deg_to_rad(player.get_direction().x)) - start_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
+		ray_direction_end_x = cos(degrees_to_radians(player.get_direction().x)) + end_stripe_x * cos(degrees_to_radians(player.get_direction().x - 90));
+		ray_direction_end_y = -sin(degrees_to_radians(player.get_direction().x)) - end_stripe_x * sin(degrees_to_radians(player.get_direction().x - 90));
+		ray_direction_start_x = cos(degrees_to_radians(player.get_direction().x)) + start_stripe_x * cos(degrees_to_radians(player.get_direction().x - 90));
+		ray_direction_start_y = -sin(degrees_to_radians(player.get_direction().x)) - start_stripe_x * sin(degrees_to_radians(player.get_direction().x - 90));
 
 		window.clear();
 
@@ -338,9 +338,9 @@ void Game::draw_gameplay() {
 void Game::draw_map()
 {
 	float frame_angle = 360.f / sprite_manager.get_sprite_data("MAP_PLAYER").total_frames;
-	float shifted_direction = get_degrees(player.get_direction().x + 0.5f * frame_angle);
-	float enemy1_shifted_direction = get_degrees(lulu.get_direction() + 0.5f * frame_angle);
-	float enemy2_shifted_direction = get_degrees(teemo.get_direction() + 0.5f * frame_angle);
+	float shifted_direction = normalize_degrees(player.get_direction().x + 0.5f * frame_angle);
+	float enemy1_shifted_direction = normalize_degrees(lulu.get_direction() + 0.5f * frame_angle);
+	float enemy2_shifted_direction = normalize_degrees(teemo.get_direction() + 0.5f * frame_angle);
 
 	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
@@ -436,13 +436,13 @@ void Game::raycast()
 		char cell_step_y = 0;
 
 		//Current stripe's x-coordinate relative to the direction of the player.
-		float current_stripe_x = tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (2 * a / static_cast<float>(gbl::SCREEN::WIDTH) - 1);
+		float current_stripe_x = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (2 * a / static_cast<float>(gbl::SCREEN::WIDTH) - 1);
 		//The angle between the player's direction and the direction to the current stripe.
 		float ray_angle;
 		//Ray's direction represented in coordinates (or distances. I don't know how to say it correctly).
 		//I wanna say "vector" but I know some people will say "ACKULUQIDARTUALLY!!!!! A vector has a DIRECTION and a MAGNITUDE!" so I won't.
-		float ray_direction_x = cos(deg_to_rad(player.get_direction().x)) + current_stripe_x * cos(deg_to_rad(player.get_direction().x - 90));
-		float ray_direction_y = -sin(deg_to_rad(player.get_direction().x)) - current_stripe_x * sin(deg_to_rad(player.get_direction().x - 90));
+		float ray_direction_x = cos(degrees_to_radians(player.get_direction().x)) + current_stripe_x * cos(degrees_to_radians(player.get_direction().x - 90));
+		float ray_direction_y = -sin(degrees_to_radians(player.get_direction().x)) - current_stripe_x * sin(degrees_to_radians(player.get_direction().x - 90));
 		float side_x;
 		//This ray checks for horizontal collisions.
 		float x_ray_length = 0;
@@ -599,12 +599,12 @@ void Game::raycast()
 			side_x -= floor(side_x);
 		}
 
-		stripes[a].set_angle(get_radians(atan2(-ray_direction_y, ray_direction_x)));
+		stripes[a].set_angle(normalize_radians(atan2(-ray_direction_y, ray_direction_x)));
 		stripes[a].set_side(side);
 		stripes[a].set_side_x(side_x);
 		stripes[a].set_x(a);
 
-		ray_angle = stripes[a].get_angle() - deg_to_rad(player.get_direction().x);
+		ray_angle = stripes[a].get_angle() - degrees_to_radians(player.get_direction().x);
 
 		//We're calculating the perpendicular distance when casting rays. But we also need the Eukacfiragridalidian distance to visualize the FOV on the map.
 		stripes[a].set_true_distance(stripes[a].get_distance() / abs(cos(ray_angle)));

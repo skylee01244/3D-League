@@ -45,7 +45,7 @@ float Lulu::get_distance() const
 
 int Lulu::get_height() const
 {
-	return round(gbl::SCREEN::HEIGHT / (distance * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL))));
+	return round(gbl::SCREEN::HEIGHT / (distance * tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL))));
 }
 
 int Lulu::get_width() const
@@ -53,7 +53,7 @@ int Lulu::get_width() const
 	float sprite_height = sprite_manager->get_sprite_data("LULU").texture_box.height;
 	float sprite_width = sprite_manager->get_sprite_data("LULU").texture_box.width;
 
-	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
+	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 }
 
 int Lulu::get_x() const
@@ -112,8 +112,8 @@ void Lulu::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player
 {
 	if (1 == i_window.hasFocus())
 	{
-		float angle = get_radians(atan2(i_player_position.y - position.y, position.x - i_player_position.x));
-		float difference = deg_difference(i_player_direction.x, rad_to_deg(angle));
+		float angle = normalize_radians(atan2(i_player_position.y - position.y, position.x - i_player_position.x));
+		float difference = degrees_difference(i_player_direction.x, radians_to_degrees(angle));
 		float frame_angle = 360.f / sprite_manager->get_sprite_data("LULU").total_frames;
 		float shifted_direction;
 		float speed = 0;
@@ -129,7 +129,7 @@ void Lulu::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player
 			astar_reset(astar_path_length, astar_previous_cell, astar_path_vector, astar_f_scores, astar_g_scores, astar_h_scores, finish_position, start_position, astar_map);
 			astar_search(astar_path_length, astar_previous_cell, astar_path_vector, astar_f_scores, astar_g_scores, astar_h_scores, next_cell, finish_position, start_position, astar_map);
 
-			direction = rad_to_deg(atan2(position.y - next_cell.y, next_cell.x - position.x));
+			direction = radians_to_degrees(atan2(position.y - next_cell.y, next_cell.x - position.x));
 
 			speed = gbl::ENEMY::MOVEMENT_SPEED;
 		}
@@ -180,17 +180,17 @@ void Lulu::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player
 		}
 
 		//This makes it so that the difference is between -180 to 180.
-		if (deg_difference(i_player_direction.x, difference + rad_to_deg(angle)) < deg_difference(i_player_direction.x, rad_to_deg(angle) - difference))
+		if (degrees_difference(i_player_direction.x, difference + radians_to_degrees(angle)) < degrees_difference(i_player_direction.x, radians_to_degrees(angle) - difference))
 		{
 			difference *= -1;
 		}
 
-		shifted_direction = get_degrees(90 + get_degrees(direction + 0.5f * frame_angle) - difference - i_player_direction.x);
+		shifted_direction = normalize_degrees(90 + normalize_degrees(direction + 0.5f * frame_angle) - difference - i_player_direction.x);
 
 		//Calculating the perpendicular distance from Steven to the player.
-		distance = abs(i_player_position.y - position.y - tan(deg_to_rad(i_player_direction.x - 90)) * (position.x - i_player_position.x)) / sqrt(1 + pow(tan(deg_to_rad(i_player_direction.x - 90)), 2));
+		distance = abs(i_player_position.y - position.y - tan(degrees_to_radians(i_player_direction.x - 90)) * (position.x - i_player_position.x)) / sqrt(1 + pow(tan(degrees_to_radians(i_player_direction.x - 90)), 2));
 
-		screen_x = round(0.5f * gbl::SCREEN::WIDTH * (1 - tan(deg_to_rad(difference)) / tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
+		screen_x = round(0.5f * gbl::SCREEN::WIDTH * (1 - tan(degrees_to_radians(difference)) / tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 
 		in_the_view = 90 > abs(difference);
 

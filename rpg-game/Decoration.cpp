@@ -42,7 +42,7 @@ float Decoration::get_distance() const
 
 int Decoration::get_height() const
 {
-	return round(gbl::SCREEN::HEIGHT / (distance * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL))));
+	return round(gbl::SCREEN::HEIGHT / (distance * tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL))));
 }
 
 int Decoration::get_width() const
@@ -50,7 +50,7 @@ int Decoration::get_width() const
 	float sprite_height = sprite_manager->get_sprite_data(sprite_name).texture_box.height;
 	float sprite_width = sprite_manager->get_sprite_data(sprite_name).texture_box.width;
 
-	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
+	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 }
 
 int Decoration::get_x() const
@@ -87,19 +87,19 @@ void Decoration::draw(const short i_pitch, sf::RenderWindow& i_window)
 
 void Decoration::update(const sf::Vector2f& i_player_direction, const sf::Vector2f& i_player_position)
 {
-	float angle = get_radians(atan2(i_player_position.y - position.y, position.x - i_player_position.x));
-	float difference = deg_difference(i_player_direction.x, rad_to_deg(angle));
+	float angle = normalize_radians(atan2(i_player_position.y - position.y, position.x - i_player_position.x));
+	float difference = degrees_difference(i_player_direction.x, radians_to_degrees(angle));
 
 	//This makes it so that the difference is between -180 to 180.
-	if (deg_difference(i_player_direction.x, difference + rad_to_deg(angle)) < deg_difference(i_player_direction.x, rad_to_deg(angle) - difference))
+	if (degrees_difference(i_player_direction.x, difference + radians_to_degrees(angle)) < degrees_difference(i_player_direction.x, radians_to_degrees(angle) - difference))
 	{
 		difference *= -1;
 	}
 
 	//We're calculating the perpendicular distance, not the Euqalifalistadalidian one.
-	distance = abs(i_player_position.y - position.y - tan(deg_to_rad(i_player_direction.x - 90)) * (position.x - i_player_position.x)) / sqrt(1 + pow(tan(deg_to_rad(i_player_direction.x - 90)), 2));
+	distance = abs(i_player_position.y - position.y - tan(degrees_to_radians(i_player_direction.x - 90)) * (position.x - i_player_position.x)) / sqrt(1 + pow(tan(degrees_to_radians(i_player_direction.x - 90)), 2));
 
-	screen_x = round(0.5f * gbl::SCREEN::WIDTH * (1 - tan(deg_to_rad(difference)) / tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
+	screen_x = round(0.5f * gbl::SCREEN::WIDTH * (1 - tan(degrees_to_radians(difference)) / tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 
 	in_the_view = 90 > abs(difference);
 

@@ -58,7 +58,7 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
         float rotation_horizontal = -gbl::RAYCASTING::FOV_HORIZONTAL * deltaX / i_window.getSize().x;
         float rotation_vertical = -gbl::RAYCASTING::FOV_VERTICAL * deltaY / i_window.getSize().y;
 
-        direction.x = get_degrees(direction.x + rotation_horizontal);
+        direction.x = normalize_degrees(direction.x + rotation_horizontal);
         direction.y = std::clamp<float>(direction.y + rotation_vertical, -gbl::RAYCASTING::MAX_VERTICAL_DIRECTION, gbl::RAYCASTING::MAX_VERTICAL_DIRECTION);
 
         // Key movement
@@ -67,23 +67,23 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
 
         if (moving_left)
         {
-            step_x = gbl::PLAYER::MOVEMENT_SPEED * deltaTime * cos(deg_to_rad(90 + direction.x));
-            step_y = -gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(deg_to_rad(90 + direction.x));
+            step_x = gbl::PLAYER::MOVEMENT_SPEED * deltaTime * cos(degrees_to_radians(90 + direction.x));
+            step_y = -gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(degrees_to_radians(90 + direction.x));
         }
         if (moving_right)
         {
-            step_x = gbl::PLAYER::MOVEMENT_SPEED * deltaTime * cos(deg_to_rad(direction.x - 90));
-            step_y = -gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(deg_to_rad(direction.x - 90));
+            step_x = gbl::PLAYER::MOVEMENT_SPEED * deltaTime * cos(degrees_to_radians(direction.x - 90));
+            step_y = -gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(degrees_to_radians(direction.x - 90));
         }
         if (moving_backward)
         {
-            step_x -= gbl::PLAYER::MOVEMENT_SPEED * deltaTime * cos(deg_to_rad(direction.x));
-            step_y += gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(deg_to_rad(direction.x));
+            step_x -= gbl::PLAYER::MOVEMENT_SPEED * deltaTime * cos(degrees_to_radians(direction.x));
+            step_y += gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(degrees_to_radians(direction.x));
         }
         if (moving_forward)
         {
-            step_x += gbl::PLAYER::MOVEMENT_SPEED * deltaTime * cos(deg_to_rad(direction.x));
-            step_y -= gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(deg_to_rad(direction.x));
+            step_x += gbl::PLAYER::MOVEMENT_SPEED * deltaTime * cos(degrees_to_radians(direction.x));
+            step_y -= gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(degrees_to_radians(direction.x));
         }
 
         if (1 == finish_collision(step_x + position.x, step_y + position.y, i_map))

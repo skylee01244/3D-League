@@ -58,7 +58,6 @@ namespace gbl
 		constexpr float FOV_HORIZONTAL = 90;
 		constexpr float FOV_VERTICAL = 90;
 		constexpr float MAX_VERTICAL_DIRECTION = 60;
-		constexpr float PI = 3.141592653589793116f;
 		constexpr float RENDER_DISTANCE = 8;
 	}
 
