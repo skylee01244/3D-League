@@ -28,11 +28,11 @@ namespace gbl
 		enum class Cell
 		{
 			Empty,
-			HelpWall,
-			MugWall,
+			Wall,
+			TreeWall,
 			FinishWall,
-			TextWall,
-			Wall
+			BushWall,
+			CaveWall
 		};
 
 		//A* pathfinding.

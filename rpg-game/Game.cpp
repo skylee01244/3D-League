@@ -26,7 +26,7 @@ void Game::setFrameRateLimit(unsigned int limit)
 
 Game::Game() :
 	show_map(0),
-	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
+	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	lulu(sprite_manager),
 	teemo(sprite_manager),
@@ -611,33 +611,30 @@ void Game::raycast()
 
 		switch (collision_cell)
 		{
-		case gbl::MAP::Cell::HelpWall:
+		case gbl::MAP::Cell::Wall:
 		{
-			stripes[a].set_sprite_name("HELP_WALL");
-
+			stripes[a].set_sprite_name("WALL");
 			break;
 		}
-		case gbl::MAP::Cell::MugWall:
+		case gbl::MAP::Cell::TreeWall:
 		{
-			stripes[a].set_sprite_name("MUG_WALL");
-
+			stripes[a].set_sprite_name("TREE_WALL");
 			break;
 		}
 		case gbl::MAP::Cell::FinishWall:
 		{
 			stripes[a].set_sprite_name("FINISH_WALL");
-
 			break;
 		}
-		case gbl::MAP::Cell::TextWall:
+		case gbl::MAP::Cell::BushWall:
 		{
-			stripes[a].set_sprite_name("TEXT_WALL");
-
+			stripes[a].set_sprite_name("BUSH_WALL");
 			break;
 		}
-		case gbl::MAP::Cell::Wall:
+		case gbl::MAP::Cell::CaveWall:
 		{
-			stripes[a].set_sprite_name("WALL");
+			stripes[a].set_sprite_name("CAVE_WALL");
+			break;
 		}
 		case gbl::MAP::Cell::Empty:
 		{
