@@ -47,7 +47,7 @@ gbl::MAP::Map<> convert_map_sketch(std::vector<Decoration>& i_decorations, Playe
 			}
 			else if (pixel == sf::Color(12, 74, 119))
 			{
-				i_decorations.push_back(Decoration(0, "BARREL", i_sprite_manager, a, b));
+				i_decorations.push_back(Decoration(0, "TOWER", i_sprite_manager, a, b));
 			}
 			else if (pixel == sf::Color(255, 0, 0))
 			{
@@ -55,7 +55,7 @@ gbl::MAP::Map<> convert_map_sketch(std::vector<Decoration>& i_decorations, Playe
 			}
 			else if (pixel == sf::Color(28, 53, 16))
 			{
-				i_decorations.push_back(Decoration(1, "FIRE_CAULDRON", i_sprite_manager, a, b));
+				i_decorations.push_back(Decoration(1, "BUSH", i_sprite_manager, a, b));
 			}
 			else if (pixel == sf::Color(0, 255, 0))	// Lime Green
 			{

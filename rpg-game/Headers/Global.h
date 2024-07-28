@@ -20,7 +20,7 @@ namespace gbl
 
 	namespace MAP
 	{
-		constexpr unsigned char CELL_SIZE = 4;
+		constexpr unsigned char CELL_SIZE = 3;
 		constexpr unsigned char COLUMNS = 64;
 		constexpr unsigned char ROWS = 64;
 
@@ -68,8 +68,6 @@ namespace gbl
 
 		constexpr unsigned short HEIGHT = 360;
 		constexpr unsigned short WIDTH = 640;
-
-		constexpr std::chrono::microseconds FRAME_DURATION(16667); // 60 FPS
 	}
 
 	namespace SPRITES

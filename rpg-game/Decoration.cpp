@@ -19,7 +19,7 @@ Decoration::Decoration(const bool i_is_animation, const std::string& i_sprite_na
 	sprite_manager(&i_sprite_manager),
 	animation(i_sprite_name, i_sprite_manager)
 {
-	if ("FIRE_CAULDRON" == i_sprite_name)
+	if ("BUSH" == i_sprite_name)
 	{
 		animation.set_animation_speed(gbl::SPRITES::ANIMATION_SPEED);
 	}
