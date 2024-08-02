@@ -1,8 +1,8 @@
-This is a Simple RPG game that is in progress that I am building to learn the basics of C++ SFML.
+This is a Simple 3D game that is in progress that I am building to learn the basics of C++ SFML GameDevelopment.
 
 How To Build:
 1) Install CMake https://cmake.org/download/
-2) Open the build folder in the terminal
+2) Open the project folder in the terminal
 3) Build using CMake
 > For a multi-configuration generator (Windows)
 ```
