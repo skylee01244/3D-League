@@ -26,7 +26,7 @@ void Game::setFrameRateLimit(unsigned int limit)
 
 Game::Game() :
 	show_map(0),
-	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Fullscreen),
+	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	lulu(sprite_manager),
 	teemo(sprite_manager),
@@ -74,16 +74,24 @@ bool Game::is_open() const
 	return window.isOpen();
 }
 
-void Game::calculate_fov_visualization()
-{
-	float start_x = 0.5f + player.get_position().x;
-	float start_y = 0.5f + player.get_position().y;
+void Game::updateFOV() {
+	// Calculate the start position based on player position
+	sf::Vector2f startPosition(
+		gbl::MAP::CELL_SIZE * (0.5f + player.get_position().x),
+		gbl::MAP::CELL_SIZE * (0.5f + player.get_position().y)
+	);
 
-	fov_visualization[0].position = sf::Vector2f(gbl::MAP::CELL_SIZE * start_x, gbl::MAP::CELL_SIZE * start_y);
+	fov_visualization[0].position = startPosition;
 
-	for (unsigned short a = 0; a < gbl::SCREEN::WIDTH; a++)
-	{
-		fov_visualization[1 + a].position = sf::Vector2f(gbl::MAP::CELL_SIZE * (start_x + stripes[a].get_true_distance() * cos(stripes[a].get_angle())), gbl::MAP::CELL_SIZE * (start_y - stripes[a].get_true_distance() * sin(stripes[a].get_angle())));
+	// Update FOV visualization for each stripe
+	for (unsigned short i = 0; i < gbl::SCREEN::WIDTH; ++i) {
+		float distance = stripes[i].get_true_distance();
+		float angle = stripes[i].get_angle();
+
+		fov_visualization[1 + i].position = sf::Vector2f(
+			startPosition.x + gbl::MAP::CELL_SIZE * distance * cos(angle),
+			startPosition.y - gbl::MAP::CELL_SIZE * distance * sin(angle)
+		);
 	}
 }
 
@@ -93,7 +101,8 @@ void Game::draw() {
 		draw_start_screen();
 		break;
 	case GameState::GAME_PLAYING:
-		draw_gameplay();
+		//draw_gameplay();
+		renderGameplay();
 		break;
 	case GameState::GAME_END:
 		draw_end_screen();
@@ -159,180 +168,106 @@ void Game::draw_victory_screen() {
 	sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
 }
 
-void Game::draw_gameplay() {
-	if (0 == lulu.get_caught() && 0 == teemo.get_caught())
-	{
-		bool lulu_is_drawn = 0;
-		bool teemo_is_drawn = 0;
-
-		float end_stripe_x = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
-		float ray_direction_end_x;
-		float ray_direction_end_y;
-		float ray_direction_start_x;
-		float ray_direction_start_y;
-		float start_stripe_x = -tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
-		float vertical_fov_ratio = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
-
-		short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(degrees_to_radians(player.get_direction().y)));
-
-		unsigned short decoration_index = 0;
-		unsigned short floor_start_y = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
-
-		gbl::SpriteData floor_sprite_data = sprite_manager.get_sprite_data("FLOOR");
-
-		sf::Image floor_image;
-		floor_image.loadFromFile(floor_sprite_data.image_location);
-
-		sf::Image floor_buffer_image;
-		floor_buffer_image.create(gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT - floor_start_y);
-
-		sf::Sprite floor_sprite;
-		floor_sprite.setPosition(0, floor_start_y);
-
-		sf::Texture floor_texture;
-
-		ray_direction_end_x = cos(degrees_to_radians(player.get_direction().x)) + end_stripe_x * cos(degrees_to_radians(player.get_direction().x - 90));
-		ray_direction_end_y = -sin(degrees_to_radians(player.get_direction().x)) - end_stripe_x * sin(degrees_to_radians(player.get_direction().x - 90));
-		ray_direction_start_x = cos(degrees_to_radians(player.get_direction().x)) + start_stripe_x * cos(degrees_to_radians(player.get_direction().x - 90));
-		ray_direction_start_y = -sin(degrees_to_radians(player.get_direction().x)) - start_stripe_x * sin(degrees_to_radians(player.get_direction().x - 90));
-
-		window.clear();
-
-		for (unsigned short a = floor_start_y; a < gbl::SCREEN::HEIGHT; a++)
-		{
-			float floor_step_x;
-			float floor_step_y;
-			double floor_x;
-			double floor_y;
-			float row_distance;
-
-			//We're drawing the floor row by row from top to bottom.
-			short row_y = a - pitch - 0.5f * gbl::SCREEN::HEIGHT;
-
-			unsigned char shade;
-
-			//Distance from the player to the current row we're drawing.
-			row_distance = (0 == row_y) ? std::numeric_limits<float>::max() : 0.5f * gbl::SCREEN::HEIGHT / (row_y * vertical_fov_ratio);
-
-			shade = 255 * std::clamp<float>(1 - row_distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
-
-			if (0 < shade)
-			{
-				floor_step_x = row_distance * (ray_direction_end_x - ray_direction_start_x) / gbl::SCREEN::WIDTH;
-				floor_step_y = row_distance * (ray_direction_end_y - ray_direction_start_y) / gbl::SCREEN::WIDTH;
-				//You can get the position of the current floor cell we're drawing using these variables (floor(floor_x) and floor(floor_y)).
-				//Then you'll be able to draw different floor textures.
-				floor_x = 0.5f + player.get_position().x + ray_direction_start_x * row_distance;
-				floor_y = 0.5f + player.get_position().y + ray_direction_start_y * row_distance;
-
-				for (unsigned short b = 0; b < gbl::SCREEN::WIDTH; b++)
-				{
-					sf::Color floor_image_pixel = floor_image.getPixel(floor(floor_sprite_data.texture_box.width * (5 + floor_x - floor(floor_x))), floor(floor_sprite_data.texture_box.height * (floor_y - floor(floor_y))));
-
-					floor_x += floor_step_x;
-					floor_y += floor_step_y;
-
-					floor_image_pixel *= sf::Color(shade, shade, shade);
-
-					floor_buffer_image.setPixel(b, a - floor_start_y, floor_image_pixel);
-				}
-			}
-		}
-
-		floor_texture.loadFromImage(floor_buffer_image);
-
-		floor_sprite.setTexture(floor_texture);
-
-		window.draw(floor_sprite);
-
-		calculate_fov_visualization();
-
-		std::sort(decorations.begin(), decorations.end(), std::greater());
-		std::sort(stripes.begin(), stripes.end(), std::greater());
-
-		//Drawing things layer by layer.
-		for (Stripe& stripe : stripes)
-		{
-			while (decoration_index < decorations.size() && stripe.get_distance() < decorations[decoration_index].get_distance())
-			{
-				if (0 == lulu_is_drawn)
-				{
-					if (lulu.get_distance() > decorations[decoration_index].get_distance())
-					{
-						lulu_is_drawn = 1;
-						lulu.draw(pitch, window);
-					}
-				}
-				if (0 == teemo_is_drawn)
-				{
-					if (teemo.get_distance() > decorations[decoration_index].get_distance())
-					{
-						teemo_is_drawn = 1;
-						teemo.draw(pitch, window);
-					}
-				}
-				decorations[decoration_index].draw(pitch, window);
-
-				decoration_index++;
-			}
-
-			if (0 == lulu_is_drawn)
-			{
-				if (lulu.get_distance() > stripe.get_distance())
-				{
-					lulu_is_drawn = 1;
-					lulu.draw(pitch, window);
-				}
-			}
-			if (0 == teemo_is_drawn)
-			{
-				if (teemo.get_distance() > stripe.get_distance())
-				{
-					teemo_is_drawn = 1;
-					teemo.draw(pitch, window);
-				}
-			}
-			stripe.draw(pitch, window);
-		}
-
-		for (unsigned short a = decoration_index; a < decorations.size(); a++)
-		{
-			if (0 == lulu_is_drawn)
-			{
-				if (lulu.get_distance() > decorations[a].get_distance())
-				{
-					lulu_is_drawn = 1;
-					lulu.draw(pitch, window);
-				}
-			}
-			if (0 == teemo_is_drawn)
-			{
-				if (teemo.get_distance() > decorations[decoration_index].get_distance())
-				{
-					teemo_is_drawn = 1;
-					teemo.draw(pitch, window);
-				}
-			}
-			decorations[a].draw(pitch, window);
-		}
-
-		if (0 == lulu_is_drawn)
-		{
-			lulu.draw(pitch, window);
-		}
-		if (0 == teemo_is_drawn)
-		{
-			teemo.draw(pitch, window);
-		}
-		if (1 == show_map)
-		{
-			draw_map();
-		}
-	}
-	else
-	{
+void Game::renderGameplay() {
+	if (lulu.get_caught() || teemo.get_caught()) {
 		game_state = GameState::GAME_END;
+		return;
 	}
+
+	bool isLuluDrawn = false;
+	bool isTeemoDrawn = false;
+
+	float startStripeX = -tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
+	float endStripeX = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
+	float verticalFovRatio = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
+	short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(degrees_to_radians(player.get_direction().y)));
+	unsigned short floorStartY = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
+
+	gbl::SpriteData floorSpriteData = sprite_manager.get_sprite_data("FLOOR");
+	sf::Image floorImage, floorBufferImage;
+	floorImage.loadFromFile(floorSpriteData.image_location);
+	floorBufferImage.create(gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT - floorStartY);
+
+	sf::Sprite floorSprite;
+	floorSprite.setPosition(0, floorStartY);
+	sf::Texture floorTexture;
+
+	float playerDirection = degrees_to_radians(player.get_direction().x);
+	float playerDirectionOffset = degrees_to_radians(player.get_direction().x - 90);
+	float rayDirStartX = cos(playerDirection) + startStripeX * cos(playerDirectionOffset);
+	float rayDirStartY = -sin(playerDirection) - startStripeX * sin(playerDirectionOffset);
+	float rayDirEndX = cos(playerDirection) + endStripeX * cos(playerDirectionOffset);
+	float rayDirEndY = -sin(playerDirection) - endStripeX * sin(playerDirectionOffset);
+
+	window.clear();
+
+	for (unsigned short y = floorStartY; y < gbl::SCREEN::HEIGHT; ++y) {
+		short rowY = y - pitch - 0.5f * gbl::SCREEN::HEIGHT;
+		float rowDistance = (rowY == 0) ? std::numeric_limits<float>::max() : 0.5f * gbl::SCREEN::HEIGHT / (rowY * verticalFovRatio);
+		unsigned char shade = 255 * std::clamp<float>(1 - rowDistance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
+
+		if (shade > 0) {
+			float floorStepX = rowDistance * (rayDirEndX - rayDirStartX) / gbl::SCREEN::WIDTH;
+			float floorStepY = rowDistance * (rayDirEndY - rayDirStartY) / gbl::SCREEN::WIDTH;
+			float floorX = 0.5f + player.get_position().x + rayDirStartX * rowDistance;
+			float floorY = 0.5f + player.get_position().y + rayDirStartY * rowDistance;
+
+			for (unsigned short x = 0; x < gbl::SCREEN::WIDTH; ++x) {
+				unsigned int textureX = static_cast<unsigned int>(floorSpriteData.texture_box.width * (5 + floorX - floor(floorX)));
+				unsigned int textureY = static_cast<unsigned int>(floorSpriteData.texture_box.height * (floorY - floor(floorY)));
+
+				// check bounds of the image
+				textureX = std::clamp(textureX, 0u, floorImage.getSize().x - 1);
+				textureY = std::clamp(textureY, 0u, floorImage.getSize().y - 1);
+
+				sf::Color pixelColor = floorImage.getPixel(textureX, textureY);
+				floorX += floorStepX;
+				floorY += floorStepY;
+				pixelColor *= sf::Color(shade, shade, shade);
+				floorBufferImage.setPixel(x, y - floorStartY, pixelColor);
+			}
+		}
+	}
+
+	floorTexture.loadFromImage(floorBufferImage);
+	floorSprite.setTexture(floorTexture);
+	window.draw(floorSprite);
+
+	updateFOV();
+
+	std::sort(decorations.begin(), decorations.end(), std::greater<>());
+	std::sort(stripes.begin(), stripes.end(), std::greater<>());
+
+	unsigned short decorationIndex = 0;
+
+	auto drawCharacter = [&](auto& character, bool& isDrawn) {
+		if (!isDrawn && decorationIndex < decorations.size() && character.get_distance() > decorations[decorationIndex].get_distance()) {
+			isDrawn = true;
+			character.draw(pitch, window);
+		}
+		};
+
+	for (Stripe& stripe : stripes) {
+		while (decorationIndex < decorations.size() && stripe.get_distance() < decorations[decorationIndex].get_distance()) {
+			drawCharacter(lulu, isLuluDrawn);
+			drawCharacter(teemo, isTeemoDrawn);
+			decorations[decorationIndex++].draw(pitch, window);
+		}
+
+		drawCharacter(lulu, isLuluDrawn);
+		drawCharacter(teemo, isTeemoDrawn);
+		stripe.draw(pitch, window);
+	}
+
+	for (unsigned short i = decorationIndex; i < decorations.size(); ++i) {
+		drawCharacter(lulu, isLuluDrawn);
+		drawCharacter(teemo, isTeemoDrawn);
+		decorations[i].draw(pitch, window);
+	}
+
+	if (!isLuluDrawn) lulu.draw(pitch, window);
+	if (!isTeemoDrawn) teemo.draw(pitch, window);
+	if (show_map) draw_map();
 }
 
 void Game::draw_map()
