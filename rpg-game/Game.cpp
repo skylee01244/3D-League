@@ -362,151 +362,88 @@ void Game::handle_events()
 
 void Game::raycast()
 {
-	float ray_start_x = 0.5f + player.get_position().x;
-	float ray_start_y = 0.5f + player.get_position().y;
+	float startX = 0.5f + player.get_position().x;
+	float startY = 0.5f + player.get_position().y;
 
-	for (unsigned short a = 0; a < gbl::SCREEN::WIDTH; a++)
+	for (unsigned short x = 0; x < gbl::SCREEN::WIDTH; x++)
 	{
-		char cell_step_x = 0;
-		char cell_step_y = 0;
+		char stepX = 0, stepY = 0;
+		float stripeX = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (2 * x / static_cast<float>(gbl::SCREEN::WIDTH) - 1);
+		float rayAngle, rayDirX, rayDirY, sideX;
+		float rayLengthX = 0, rayUnitLengthX, rayLengthY = 0, rayUnitLengthY;
+		unsigned char cellX, cellY, wallSide;
+		gbl::MAP::Cell hitCell;
 
-		//Current stripe's x-coordinate relative to the direction of the player.
-		float current_stripe_x = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (2 * a / static_cast<float>(gbl::SCREEN::WIDTH) - 1);
-		//The angle between the player's direction and the direction to the current stripe.
-		float ray_angle;
-		//Ray's direction represented in coordinates (or distances. I don't know how to say it correctly).
-		//I wanna say "vector" but I know some people will say "ACKULUQIDARTUALLY!!!!! A vector has a DIRECTION and a MAGNITUDE!" so I won't.
-		float ray_direction_x = cos(degrees_to_radians(player.get_direction().x)) + current_stripe_x * cos(degrees_to_radians(player.get_direction().x - 90));
-		float ray_direction_y = -sin(degrees_to_radians(player.get_direction().x)) - current_stripe_x * sin(degrees_to_radians(player.get_direction().x - 90));
-		float side_x;
-		//This ray checks for horizontal collisions.
-		float x_ray_length = 0;
-		float x_ray_unit_length = (0 == ray_direction_x) ? std::numeric_limits<float>::max() : std::abs(1 / ray_direction_x);
-		//This ray checks for vertical collisions.
-		float y_ray_length = 0;
-		float y_ray_unit_length = (0 == ray_direction_y) ? std::numeric_limits<float>::max() : std::abs(1 / ray_direction_y);
+		rayDirX = cos(degrees_to_radians(player.get_direction().x)) + stripeX * cos(degrees_to_radians(player.get_direction().x - 90));
+		rayDirY = -sin(degrees_to_radians(player.get_direction().x)) - stripeX * sin(degrees_to_radians(player.get_direction().x - 90));
+		rayUnitLengthX = (rayDirX == 0) ? std::numeric_limits<float>::max() : std::abs(1 / rayDirX);
+		rayUnitLengthY = (rayDirY == 0) ? std::numeric_limits<float>::max() : std::abs(1 / rayDirY);
 
-		unsigned char current_cell_x = floor(ray_start_x);
-		unsigned char current_cell_y = floor(ray_start_y);
-		//The side of the wall.
-		//When you're looking at the map from above.
-		//0 - Left side.
-		//1 - Top side.
-		//2 - Right side.
-		//3 - Bottom side.
-		unsigned char side = 0;
+		cellX = floor(startX);
+		cellY = floor(startY);
 
-		gbl::MAP::Cell collision_cell;
-
-		//In order for the algorithm to work, the ray must start at the cell borders.
-		//So if the starting position of the ray is not a cell border (which is very likely), we'll stretch it to the closest one.
-		if (0 > ray_direction_x)
+		if (rayDirX < 0)
 		{
-			cell_step_x = -1;
-
-			x_ray_length = x_ray_unit_length * (ray_start_x - current_cell_x);
+			stepX = -1;
+			rayLengthX = rayUnitLengthX * (startX - cellX);
 		}
-		else if (0 < ray_direction_x)
+		else if (rayDirX > 0)
 		{
-			cell_step_x = 1;
-
-			x_ray_length = x_ray_unit_length * (1 + current_cell_x - ray_start_x);
+			stepX = 1;
+			rayLengthX = rayUnitLengthX * (1 + cellX - startX);
 		}
 
-		if (0 > ray_direction_y)
+		if (rayDirY < 0)
 		{
-			cell_step_y = -1;
-
-			y_ray_length = y_ray_unit_length * (ray_start_y - current_cell_y);
+			stepY = -1;
+			rayLengthY = rayUnitLengthY * (startY - cellY);
 		}
-		else if (0 < ray_direction_y)
+		else if (rayDirY > 0)
 		{
-			cell_step_y = 1;
-
-			y_ray_length = y_ray_unit_length * (1 + current_cell_y - ray_start_y);
+			stepY = 1;
+			rayLengthY = rayUnitLengthY * (1 + cellY - startY);
 		}
 
-		while (1)
+		while (true)
 		{
-			//In case the ray hits a corner.
-			//I'm a perfectionist (i. e. stupid).
-			bool corner_collision = 0;
+			bool cornerHit = false;
 
-			//We stretch the shortest ray.
-			if (x_ray_length < y_ray_length)
+			if (rayLengthX < rayLengthY)
 			{
-				stripes[a].set_distance(x_ray_length);
-
-				x_ray_length += x_ray_unit_length;
-
-				current_cell_x += cell_step_x;
-
-				if (1 == cell_step_x)
-				{
-					side = 2;
-				}
-				else
-				{
-					side = 0;
-				}
+				stripes[x].set_distance(rayLengthX);
+				rayLengthX += rayUnitLengthX;
+				cellX += stepX;
+				wallSide = (stepX == 1) ? 2 : 0;
 			}
-			else if (x_ray_length > y_ray_length)
+			else if (rayLengthX > rayLengthY)
 			{
-				stripes[a].set_distance(y_ray_length);
-
-				y_ray_length += y_ray_unit_length;
-
-				current_cell_y += cell_step_y;
-
-				if (-1 == cell_step_y)
-				{
-					side = 3;
-				}
-				else
-				{
-					side = 1;
-				}
+				stripes[x].set_distance(rayLengthY);
+				rayLengthY += rayUnitLengthY;
+				cellY += stepY;
+				wallSide = (stepY == -1) ? 3 : 1;
 			}
-			else //If the rays are equal, that means we hit the corner, so we stretch both rays.
+			else
 			{
-				corner_collision = 1;
-
-				stripes[a].set_distance(x_ray_length);
-
-				x_ray_length += x_ray_unit_length;
-				y_ray_length += y_ray_unit_length;
-
-				current_cell_x += cell_step_x;
-				current_cell_y += cell_step_y;
-
-				if (1 == cell_step_x)
-				{
-					side = 2;
-				}
-				else
-				{
-					side = 0;
-				}
+				cornerHit = true;
+				stripes[x].set_distance(rayLengthX);
+				rayLengthX += rayUnitLengthX;
+				rayLengthY += rayUnitLengthY;
+				cellX += stepX;
+				cellY += stepY;
+				wallSide = (stepX == 1) ? 2 : 0;
 			}
 
-			//Making sure the current cell we're checking is inside our map.
-			if (0 <= current_cell_x && 0 <= current_cell_y && gbl::MAP::COLUMNS > current_cell_x && gbl::MAP::ROWS > current_cell_y)
+			if (cellX >= 0 && cellY >= 0 && cellX < gbl::MAP::COLUMNS && cellY < gbl::MAP::ROWS)
 			{
-				if (gbl::MAP::Cell::Empty != map[current_cell_x][current_cell_y])
+				if (gbl::MAP::Cell::Empty != map[cellX][cellY])
 				{
-					collision_cell = map[current_cell_x][current_cell_y];
-
+					hitCell = map[cellX][cellY];
 					break;
 				}
-				else if (1 == corner_collision)
+				else if (cornerHit && gbl::MAP::Cell::Empty != map[cellX - stepX][cellY] && gbl::MAP::Cell::Empty != map[cellX][cellY - stepY])
 				{
-					//The ray can't go through 2 walls standing diagonally.
-					if (gbl::MAP::Cell::Empty != map[current_cell_x - cell_step_x][current_cell_y] && gbl::MAP::Cell::Empty != map[current_cell_x][current_cell_y - cell_step_y])
-					{
-						collision_cell = map[current_cell_x - cell_step_x][current_cell_y];
-
-						break;
-					}
+					hitCell = map[cellX - stepX][cellY];
+					break;
 				}
 			}
 			else
@@ -515,70 +452,38 @@ void Game::raycast()
 			}
 		}
 
-		//Once we hit the wall, we need to find where exactly we hit it to draw the texture correctly.
-		if (0 == side % 2)
-		{
-			side_x = ray_start_y + ray_direction_y * stripes[a].get_distance();
-		}
-		else
-		{
-			side_x = ray_start_x + ray_direction_x * stripes[a].get_distance();
-		}
+		sideX = (wallSide % 2 == 0) ? startY + rayDirY * stripes[x].get_distance() : startX + rayDirX * stripes[x].get_distance();
+		sideX = (wallSide < 2) ? ceil(sideX) - sideX : sideX - floor(sideX);
 
-		if (2 > side)
-		{
-			side_x = ceil(side_x) - side_x;
-		}
-		else
-		{
-			side_x -= floor(side_x);
-		}
+		stripes[x].set_angle(normalize_radians(atan2(-rayDirY, rayDirX)));
+		stripes[x].set_side(wallSide);
+		stripes[x].set_side_x(sideX);
+		stripes[x].set_x(x);
 
-		stripes[a].set_angle(normalize_radians(atan2(-ray_direction_y, ray_direction_x)));
-		stripes[a].set_side(side);
-		stripes[a].set_side_x(side_x);
-		stripes[a].set_x(a);
+		rayAngle = stripes[x].get_angle() - degrees_to_radians(player.get_direction().x);
+		stripes[x].set_true_distance(stripes[x].get_distance() / std::abs(cos(rayAngle)));
 
-		ray_angle = stripes[a].get_angle() - degrees_to_radians(player.get_direction().x);
-
-		//We're calculating the perpendicular distance when casting rays. But we also need the Eukacfiragridalidian distance to visualize the FOV on the map.
-		stripes[a].set_true_distance(stripes[a].get_distance() / abs(cos(ray_angle)));
-
-		switch (collision_cell)
+		switch (hitCell)
 		{
 		case gbl::MAP::Cell::Wall:
-		{
-			stripes[a].set_sprite_name("WALL");
+			stripes[x].set_sprite_name("WALL");
 			break;
-		}
 		case gbl::MAP::Cell::TreeWall:
-		{
-			stripes[a].set_sprite_name("TREE_WALL");
+			stripes[x].set_sprite_name("TREE_WALL");
 			break;
-		}
 		case gbl::MAP::Cell::FinishWall:
-		{
-			stripes[a].set_sprite_name("FINISH_WALL");
+			stripes[x].set_sprite_name("FINISH_WALL");
 			break;
-		}
 		case gbl::MAP::Cell::BushWall:
-		{
-			stripes[a].set_sprite_name("BUSH_WALL");
+			stripes[x].set_sprite_name("BUSH_WALL");
 			break;
-		}
 		case gbl::MAP::Cell::CaveWall:
-		{
-			stripes[a].set_sprite_name("CAVE_WALL");
+			stripes[x].set_sprite_name("CAVE_WALL");
 			break;
-		}
 		case gbl::MAP::Cell::Empty:
-		{
 			break;
-		}
 		default:
-		{
 			break;
-		}
 		}
 	}
 }
