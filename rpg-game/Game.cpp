@@ -360,7 +360,7 @@ void Game::handle_events()
 	}
 }
 
-void Game::raycast()
+void Game::performRaycasting()
 {
 	float startX = 0.5f + player.get_position().x;
 	float startY = 0.5f + player.get_position().y;
@@ -446,10 +446,7 @@ void Game::raycast()
 					break;
 				}
 			}
-			else
-			{
-				break;
-			}
+			else { break; }
 		}
 
 		sideX = (wallSide % 2 == 0) ? startY + rayDirY * stripes[x].get_distance() : startX + rayDirX * stripes[x].get_distance();
@@ -495,19 +492,13 @@ void Game::update(float deltaTime)
 	}
 	if (game_state == GameState::GAME_PLAYING)
 	{
-		float player_movement_distance;
-
 		sf::Vector2f player_position = player.get_position();
 
 		player.update(window, map, deltaTime, game_state);
-
 		lulu.update(window, player.get_direction(), player.get_position(), map, deltaTime);
-
 		teemo.update(window, player.get_direction(), player.get_position(), map, deltaTime);
 
-		player_movement_distance = sqrt(pow(player_position.x - player.get_position().x, 2) + pow(player_position.y - player.get_position().y, 2));
-
-		raycast();
+		performRaycasting();
 
 		for (Decoration& decoration : decorations)
 		{

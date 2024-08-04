@@ -42,10 +42,9 @@ public:
 	void draw_start_screen();
 	void draw_end_screen();
 	void draw_victory_screen();
-	//void draw_gameplay();
 	void renderGameplay();
 	void draw_map();
 	void handle_events();
-	void raycast();
+	void performRaycasting();
 	void update(float deltaTime);
 };
