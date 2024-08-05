@@ -299,8 +299,8 @@ void Game::draw_map()
 
 	window.draw(fov_visualization);
 
-	sprite_manager.draw_sprite(floor(enemy1_shifted_direction / frame_angle), "MAP_STEVEN", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * lulu.get_position().x), round(gbl::MAP::CELL_SIZE * lulu.get_position().y)), window);
-	sprite_manager.draw_sprite(floor(enemy2_shifted_direction / frame_angle), "MAP_STEVEN", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * teemo.get_position().x), round(gbl::MAP::CELL_SIZE * teemo.get_position().y)), window);
+	sprite_manager.draw_sprite(floor(enemy1_shifted_direction / frame_angle), "MAP_ENEMY", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * lulu.get_position().x), round(gbl::MAP::CELL_SIZE * lulu.get_position().y)), window);
+	sprite_manager.draw_sprite(floor(enemy2_shifted_direction / frame_angle), "MAP_ENEMY", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * teemo.get_position().x), round(gbl::MAP::CELL_SIZE * teemo.get_position().y)), window);
 	sprite_manager.draw_sprite(floor(shifted_direction / frame_angle), "MAP_PLAYER", sf::Vector2<short>(round(gbl::MAP::CELL_SIZE * player.get_position().x), round(gbl::MAP::CELL_SIZE * player.get_position().y)), window);
 }
 
