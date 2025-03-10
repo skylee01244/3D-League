@@ -18,7 +18,7 @@ set(SOURCES
     Astar.cpp
     ConvertMapSketch.cpp 
     Decoration.cpp 
-    Enemy.cpp 
+    Lulu.cpp 
     Teemo.cpp
     Game.cpp 
     GetCell.cpp 
