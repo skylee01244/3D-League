@@ -33,6 +33,13 @@ add_executable(main ${SOURCES})
 target_link_libraries(main PRIVATE sfml-graphics)
 target_compile_features(main PRIVATE cxx_std_17)
 
+add_custom_target(copy_resources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/resources
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources
+)
+add_dependencies(main copy_resources)
+
 if(WIN32)
     add_custom_command(
         TARGET main
