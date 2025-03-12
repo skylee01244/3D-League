@@ -92,5 +92,5 @@ void Animation::set_animation_speed(const float i_animation_speed)
 
 void Animation::set_current_frame(const float i_current_frame)
 {
-	current_frame = fmod(total_frames + fmod(i_current_frame, total_frames), total_frames);
+	current_frame = std::fmod(total_frames + std::fmod(i_current_frame, total_frames), total_frames);
 }
