@@ -5,7 +5,8 @@ a 3D horror chasing game is a high-performance application developed in **C++** 
 
 How To Build:
 1) Install CMake https://cmake.org/download/
-2) Open the project folder in the terminal
+2) Navigate to Your Project Directory
+Open your terminal and navigate to the project directory where `CMakeLists.txt` is located.
 3) Build using CMake
 > For a multi-configuration generator (Windows)
 ```
@@ -17,7 +18,8 @@ cmake --build build --config Release
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
-4) Move the build/bin/Release/main.exe In the directory with Resources and Run
+4) Run the Application  
+To run the application, execute the `main.exe` file located in `build/bin/Release/`.
 
 
 W A S D: to move
