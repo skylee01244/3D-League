@@ -1,8 +1,9 @@
-**__Pixel Pursuit__!!**  
+# **__Pixel Pursuit__!!**  
 a 3D horror chasing game is a high-performance application developed in **C++** using SFML. It features a custom **raycasting**  for real-time 3D rendering and integrates the __A* pathfinding algorithm__ for dynamic enemy AI. Designed with an optimized object-oriented architecture, the game ensures efficient memory management, and real-time computations, showcasing advanced C++ game development techniques.
 
 ![Screenshot of Game Screen.](/rpg-game/Resources/Game_Images/game_screen_1.png)
 
+## Build Instructions
 How To Build:
 1) Install CMake https://cmake.org/download/
 2) Navigate to Your Project Directory
@@ -22,10 +23,10 @@ cmake --build build
 To run the application, execute the `main.exe` file located in `build/bin/Release/`.
 
 
+## Play the game!
 W A S D: to move
 M: To show MiniMap
 Mouse: To look around
-
 
 > [!TIP]
 > Try to reach the other side of the map without being captured
