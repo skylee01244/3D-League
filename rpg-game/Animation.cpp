@@ -7,50 +7,37 @@
 #include "Headers/SpriteManager.h"
 #include "Headers/Animation.h"
 
-//I explained how this work in this video: https://youtu.be/Df-U3BjlnDo
-//Yeah, I'm promoting my channel here.
-
 Animation::Animation(const std::string& i_sprite_name, SpriteManager& i_sprite_manager, const bool i_ping_pong, const float i_animation_speed, const float i_current_frame) :
 	ping_pong(i_ping_pong),
 	sprite_data(&i_sprite_manager.get_sprite_data(i_sprite_name)),
 	sprite_manager(&i_sprite_manager)
 {
-	if (0 == ping_pong)
-	{
-		total_frames = sprite_data->total_frames;
-	}
-	else
-	{
-		total_frames = 2 * (sprite_data->total_frames - 1);
-	}
+	// Calculte total frames (if pingpong mode, double the sequence)
+	total_frames = (!ping_pong) ? sprite_data->total_frames : 2 * (sprite_data->total_frames - 1);
 
 	set_animation_speed(i_animation_speed);
-
 	set_current_frame(i_current_frame);
 }
 
 bool Animation::update(const char i_animation_end)
 {
-	//We're gonna return whether or not the animation ended.
-	//If the animation is going backwards and it reached the first frame, the left_end will be 1.
-	bool left_end = 0;
-	//If the animation is going forward and it reached the last frame, the right_end will be 1.
-	bool right_end = 0;
+	const float nextFrame = current_frame + animation_speed;
+	bool leftBoundaryReached = false;
+	bool rightBoundaryReached = false;
 
-	if (0 == ping_pong)
+	if (!ping_pong)
 	{
-		left_end = 0 > animation_speed + current_frame;
-		right_end = total_frames <= animation_speed + current_frame;
+		leftBoundaryReached = (nextFrame < 0);
+		rightBoundaryReached = (nextFrame >= total_frames);
 	}
 	else
 	{
-		//You have NO IDEA how long it took me to figure this out.
-		left_end = 0 > animation_speed + current_frame || total_frames <= animation_speed + current_frame;
-		right_end = current_frame < sprite_data->total_frames && sprite_data->total_frames <= animation_speed + current_frame;
-
-		if (0 == right_end)
+		leftBoundaryReached = 0 > nextFrame || total_frames <= nextFrame;
+		rightBoundaryReached = current_frame < sprite_data->total_frames && sprite_data->total_frames <= nextFrame;
+		//  animation direction switches.
+		if (!rightBoundaryReached)
 		{
-			right_end = current_frame >= sprite_data->total_frames && sprite_data->total_frames > animation_speed + current_frame;
+			rightBoundaryReached = current_frame >= sprite_data->total_frames && sprite_data->total_frames > nextFrame;
 		}
 	}
 
@@ -60,15 +47,15 @@ bool Animation::update(const char i_animation_end)
 	{
 	case -1:
 	{
-		return left_end;
+		return leftBoundaryReached;
 	}
 	case 0:
 	{
-		return left_end || right_end;
+		return leftBoundaryReached || rightBoundaryReached;
 	}
 	case 1:
 	{
-		return right_end;
+		return rightBoundaryReached;
 	}
 	default:
 	{
@@ -89,12 +76,10 @@ float Animation::get_current_frame() const
 
 void Animation::draw(const sf::Vector2<short>& i_position, sf::RenderWindow& i_window, const bool i_mirror_horizontal, const bool i_mirror_vertical, const float i_scale_x, const float i_scale_y, const sf::Color& i_color, const sf::Rect<unsigned short>& i_texture_box) const
 {
-	unsigned short frame = floor(current_frame);
+	unsigned short frame = static_cast<unsigned short>(std::floor(current_frame));
 
-	//We're treating the ping pong animation as a regular one with twice as many frames to make things easier.
-	if (1 == ping_pong && frame >= sprite_data->total_frames)
-	{
-		frame -= 2 * (1 + frame - sprite_data->total_frames);
+	if (ping_pong && frame >= sprite_data->total_frames) {
+		frame = sprite_data->total_frames - 1 - (frame - sprite_data->total_frames);
 	}
 
 	sprite_manager->draw_sprite(frame, sprite_data->name, i_position, i_window, i_mirror_horizontal, i_mirror_vertical, i_scale_x, i_scale_y, i_color, i_texture_box);
