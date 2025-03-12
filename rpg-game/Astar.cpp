@@ -14,7 +14,7 @@
 //g = Distance From start
 //h = hypothetical distance from cell to finish
 
-std::vector<sf::Vector2<unsigned short>> get_adjacent_cells(const sf::Vector2<unsigned short>& i_cell, const gbl::MAP::Map<gbl::MAP::PathCell>& i_map);
+std::vector<sf::Vector2<unsigned short>> get_adjacent_cells(const sf::Vector2<unsigned short>& currentCell, const gbl::MAP::Map<gbl::MAP::PathCell>& map);
 
 float calculate_h_score(const sf::Vector2<unsigned short>& i_cell0, const sf::Vector2<unsigned short>& i_cell1)
 {
@@ -124,9 +124,7 @@ void astar_search(unsigned short& i_path_length, std::map<gbl::Position<>, gbl::
 	}
 }
 
-std::vector<sf::Vector2<unsigned short>> get_adjacent_cells(
-	const sf::Vector2<unsigned short>& currentCell,
-	const gbl::MAP::Map<gbl::MAP::PathCell>& map) {
+std::vector<sf::Vector2<unsigned short>> get_adjacent_cells(const sf::Vector2<unsigned short>& currentCell, const gbl::MAP::Map<gbl::MAP::PathCell>& map) {
 
 	std::vector<sf::Vector2<unsigned short>> neighbors;
 
