@@ -1,5 +1,5 @@
 **__Pixel Pursuit__!!**  
-a 3D horror chasing game is a high-performance application developed in **C++** using SFML. It features a custom **raycasting**  for real-time 3D rendering and integrates the **A* pathfinding algorithm** for dynamic enemy AI. Designed with an optimized object-oriented architecture, the game ensures efficient memory management, event-driven programming, and real-time computations, showcasing advanced C++ game development techniques.
+a 3D horror chasing game is a high-performance application developed in **C++** using SFML. It features a custom **raycasting**  for real-time 3D rendering and integrates the __A* pathfinding algorithm__ for dynamic enemy AI. Designed with an optimized object-oriented architecture, the game ensures efficient memory management, and real-time computations, showcasing advanced C++ game development techniques.
 
 ![Screenshot of Game Screen.](/rpg-game/Resources/Game_Images/game_screen_1.png)
 
