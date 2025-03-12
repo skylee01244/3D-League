@@ -1,8 +1,11 @@
 #include <array>
 #include <chrono>
 #include <map>
-#include <SFML/Graphics.hpp>
+#include <vector>
+#include <cmath>
 #include <limits>
+#include <algorithm>
+#include <SFML/Graphics.hpp>
 
 #include "Headers/Global.h"
 #include "Headers/GetCell.h"
@@ -13,38 +16,30 @@
 
 std::vector<sf::Vector2<unsigned short>> get_adjacent_cells(const sf::Vector2<unsigned short>& i_cell, const gbl::MAP::Map<gbl::MAP::PathCell>& i_map);
 
-float calculate_h_score(const sf::Vector2<unsigned short>& i_cell_0, const sf::Vector2<unsigned short>& i_cell_1)
+float calculate_h_score(const sf::Vector2<unsigned short>& i_cell0, const sf::Vector2<unsigned short>& i_cell1)
 {
-	float distance_x = abs(i_cell_1.x - i_cell_0.x);
-	float distance_y = abs(i_cell_1.y - i_cell_0.y);
+	const float dx = std::abs(i_cell1.x - i_cell0.x);
+	const float dy = std::abs(i_cell1.y - i_cell0.y);
 
-	//This is the minimal distance it takes to move from cell_0 to cell_1 if we move in 8 directions and ignore every obstacle.
-	//I don't recommend using other types of distance calculations because then Astar doesn't find the shortest path.
-	return std::max(distance_x, distance_y) + std::min(distance_x, distance_y) * (sqrt(2) - 1);
+	return std::max(dx, dy) + std::min(dx, dy) * (std::sqrt(2) - 1);
 }
 
 void astar_reset(unsigned short& i_path_length, std::map<gbl::Position<>, gbl::Position<>>& i_previous_cell, std::vector<sf::Vector2<unsigned short>>& i_path_vector, gbl::MAP::Map<float>& i_f_scores, gbl::MAP::Map<float>& i_g_scores, gbl::MAP::Map<float>& i_h_scores, const sf::Vector2<unsigned short>& i_finish_position, const sf::Vector2<unsigned short>& i_start_position, gbl::MAP::Map<gbl::MAP::PathCell>& i_map)
 {
 	i_path_length = 0;
-
 	i_previous_cell.clear();
-
 	i_path_vector.clear();
 	i_path_vector.push_back(i_start_position);
 
-	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
-	{
+	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++) {
 		for (unsigned short b = 0; b < gbl::MAP::ROWS; b++)
 		{
-			//Calculating the h score beforehand because we can.
 			i_h_scores[a][b] = calculate_h_score(sf::Vector2<unsigned short>(a, b), i_finish_position);
 
-			//We're not changing the map during the game so we can reset the map here.
-			if (gbl::MAP::PathCell::Wall != i_map[a][b])
+			if (i_map[a][b] != gbl::MAP::PathCell::Wall)
 			{
 				i_map[a][b] = gbl::MAP::PathCell::Empty;
 			}
-
 			if (a == i_start_position.x && b == i_start_position.y)
 			{
 				i_f_scores[a][b] = i_h_scores[a][b];
@@ -62,46 +57,32 @@ void astar_reset(unsigned short& i_path_length, std::map<gbl::Position<>, gbl::P
 
 void astar_search(unsigned short& i_path_length, std::map<gbl::Position<>, gbl::Position<>>& i_previous_cell, std::vector<sf::Vector2<unsigned short>>& i_path_vector, gbl::MAP::Map<float>& i_f_scores, gbl::MAP::Map<float>& i_g_scores, const gbl::MAP::Map<float>& i_h_scores, sf::Vector2<unsigned short>& i_next_cell, const sf::Vector2<unsigned short>& i_finish_position, const sf::Vector2<unsigned short>& i_start_position, gbl::MAP::Map<gbl::MAP::PathCell>& i_map)
 {
-	while (1)
+	while (!i_path_vector.empty())
 	{
-		if (1 == i_path_vector.empty())
-		{
-			return;
-		}
-
-		std::vector<sf::Vector2<unsigned short>>::iterator min_f_cell_iterator = i_path_vector.begin();
-
-		//Here we're finding the cell with the lowest f score.
-		sf::Vector2<unsigned short> min_f_cell;
-
+		std::vector<sf::Vector2<unsigned short>>::iterator current_iterator = i_path_vector.begin();
+		sf::Vector2<unsigned short> currrent_cell;
 		for (std::vector<sf::Vector2<unsigned short>>::iterator a = 1 + i_path_vector.begin(); a != i_path_vector.end(); a++)
 		{
-			if (i_f_scores[a->x][a->y] < i_f_scores[min_f_cell_iterator->x][min_f_cell_iterator->y])
+			if (i_f_scores[a->x][a->y] < i_f_scores[current_iterator->x][current_iterator->y])
 			{
-				min_f_cell_iterator = a;
+				current_iterator = a;
 			}
 		}
 
-		min_f_cell = *min_f_cell_iterator;
+		currrent_cell = *current_iterator;
 
-		if (std::numeric_limits<float>::max() == i_f_scores[min_f_cell.x][min_f_cell.y])
-		{
-			return;
-		}
+		if (i_f_scores[currrent_cell.x][currrent_cell.y] == std::numeric_limits<float>::max()) { return; }
 
-		i_path_vector.erase(min_f_cell_iterator);
+		i_path_vector.erase(current_iterator);
 
-		i_map[min_f_cell.x][min_f_cell.y] = gbl::MAP::PathCell::Visited;
+		i_map[currrent_cell.x][currrent_cell.y] = gbl::MAP::PathCell::Visited;
 
-		if (min_f_cell == i_finish_position)
-		{
-			gbl::Position<> path_cell(min_f_cell.x, min_f_cell.y);
+		if (currrent_cell == i_finish_position)	{	// reconstruct the path
+			gbl::Position<> path_cell(currrent_cell.x, currrent_cell.y);
 
 			do
 			{
 				i_path_length++;
-
-				//Steven only needs the position of the next cell he should go to.
 				i_next_cell.x = path_cell.first;
 				i_next_cell.y = path_cell.second;
 
@@ -111,24 +92,24 @@ void astar_search(unsigned short& i_path_length, std::map<gbl::Position<>, gbl::
 			return;
 		}
 
-		for (const sf::Vector2<unsigned short>& adjacent_cell : get_adjacent_cells(min_f_cell, i_map))
+		for (const sf::Vector2<unsigned short>& adjacent_cell : get_adjacent_cells(currrent_cell, i_map))
 		{
-			if (gbl::MAP::PathCell::Visited != i_map[adjacent_cell.x][adjacent_cell.y])
+			if (i_map[adjacent_cell.x][adjacent_cell.y] != gbl::MAP::PathCell::Visited)
 			{
-				float g_score = i_g_scores[min_f_cell.x][min_f_cell.y];
+				float g_score = i_g_scores[currrent_cell.x][currrent_cell.y];
 
-				if (abs(adjacent_cell.x - min_f_cell.x) == abs(adjacent_cell.y - min_f_cell.y))
+				if (std::abs(adjacent_cell.x - currrent_cell.x) == std::abs(adjacent_cell.y - currrent_cell.y))
 				{
-					g_score += sqrt(2);
+					g_score += std::sqrt(2);
 				}
 				else
 				{
-					g_score++;
+					g_score += std::sqrt(1);
 				}
 
 				if (g_score < i_g_scores[adjacent_cell.x][adjacent_cell.y])
 				{
-					i_previous_cell[gbl::Position<>(adjacent_cell.x, adjacent_cell.y)] = gbl::Position<>(min_f_cell.x, min_f_cell.y);
+					i_previous_cell[gbl::Position<>(adjacent_cell.x, adjacent_cell.y)] = gbl::Position<>(currrent_cell.x, currrent_cell.y);
 
 					i_f_scores[adjacent_cell.x][adjacent_cell.y] = g_score + i_h_scores[adjacent_cell.x][adjacent_cell.y];
 					i_g_scores[adjacent_cell.x][adjacent_cell.y] = g_score;
@@ -143,42 +124,42 @@ void astar_search(unsigned short& i_path_length, std::map<gbl::Position<>, gbl::
 	}
 }
 
-std::vector<sf::Vector2<unsigned short>> get_adjacent_cells(const sf::Vector2<unsigned short>& i_cell, const gbl::MAP::Map<gbl::MAP::PathCell>& i_map)
-{
-	std::array<bool, 9> valid_adjacent_cells = {};
+std::vector<sf::Vector2<unsigned short>> get_adjacent_cells(
+	const sf::Vector2<unsigned short>& currentCell,
+	const gbl::MAP::Map<gbl::MAP::PathCell>& map) {
 
-	std::vector<sf::Vector2<unsigned short>> adjacent_cells;
-	std::vector<sf::Vector2<unsigned short>> diagonal_adjacent_cells;
+	std::vector<sf::Vector2<unsigned short>> neighbors;
 
-	for (unsigned char a = 0; a < valid_adjacent_cells.size(); a++)
-	{
-		gbl::MAP::PathCell cell = get_cell(sf::Vector2<short>(i_cell.x + a % 3 - 1, i_cell.y + floor(a / 3.f) - 1), i_map);
+	for (int dy = -1; dy <= 1; ++dy) {
+		for (int dx = -1; dx <= 1; ++dx) {
+			if (dx == 0 && dy == 0)
+				continue;
 
-		valid_adjacent_cells[a] = gbl::MAP::PathCell::Invalid != cell && gbl::MAP::PathCell::Wall != cell;
-	}
+			const int neighborX = static_cast<int>(currentCell.x) + dx;
+			const int neighborY = static_cast<int>(currentCell.y) + dy;
+			sf::Vector2<short> neighborPos{ static_cast<short>(neighborX), static_cast<short>(neighborY) };
 
-	for (unsigned char a = 0; a < 3; a++)
-	{
-		for (unsigned char b = 0; b < 3; b++)
-		{
-			if ((1 != a || 1 != b) && 1 == valid_adjacent_cells[b + 3 * a])
-			{
-				if (abs(a - 1) == abs(b - 1))
-				{
-					//When a potential adjacent cell is located diagonally, we need to check 2 additional cells as well.
-					if (1 == valid_adjacent_cells[1 + 3 * a] && 1 == valid_adjacent_cells[3 + b])
-					{
-						diagonal_adjacent_cells.push_back(sf::Vector2<unsigned short>(b + i_cell.x - 1, a + i_cell.y - 1));
-					}
-				}
-				else
-				{
-					adjacent_cells.push_back(sf::Vector2<unsigned short>(b + i_cell.x - 1, a + i_cell.y - 1));
+			const auto neighborCell = get_cell(neighborPos, map);
+			if (neighborCell == gbl::MAP::PathCell::Invalid ||
+				neighborCell == gbl::MAP::PathCell::Wall) {
+				continue;
+			}
+
+			if (dx != 0 && dy != 0) {
+				sf::Vector2<short> adjacent1{ static_cast<short>(currentCell.x + dx), static_cast<short>(currentCell.y) };
+				sf::Vector2<short> adjacent2{ static_cast<short>(currentCell.x), static_cast<short>(currentCell.y + dy) };
+				const auto cell1 = get_cell(adjacent1, map);
+				const auto cell2 = get_cell(adjacent2, map);
+
+				if (cell1 == gbl::MAP::PathCell::Invalid || cell1 == gbl::MAP::PathCell::Wall ||
+					cell2 == gbl::MAP::PathCell::Invalid || cell2 == gbl::MAP::PathCell::Wall) {
+					continue;
 				}
 			}
+
+			neighbors.push_back({ static_cast<unsigned short>(neighborX),
+								 static_cast<unsigned short>(neighborY) });
 		}
 	}
-	adjacent_cells.insert(adjacent_cells.end(), diagonal_adjacent_cells.begin(), diagonal_adjacent_cells.end());
-
-	return adjacent_cells;
+	return neighbors;
 }
