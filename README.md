@@ -1,5 +1,7 @@
 This is a Simple 3D game that is in progress that I am building to learn the basics of C++ SFML GameDevelopment.
 
+![Screenshot of Game Screen.](/rpg-game/Resources/Game_Images/game_screen_1.png)
+
 How To Build:
 1) Install CMake https://cmake.org/download/
 2) Open the project folder in the terminal
