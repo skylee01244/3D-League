@@ -3,7 +3,6 @@
 
 class Animation
 {
-	//Does the animation go back and forth?
 	bool ping_pong;
 
 	float animation_speed;
