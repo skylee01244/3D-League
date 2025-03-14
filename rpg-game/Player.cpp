@@ -1,6 +1,7 @@
 #include <array>
 #include <chrono>
 #include <iostream>
+#include <cmath>
 #ifdef __APPLE__
 #include <ApplicationServices/ApplicationServices.h> // For macOS
 #endif
@@ -54,9 +55,10 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
         sf::Mouse::setPosition(window_center, i_window);
 #endif
 
+
         // Calculate rotations based on the delta
-        float rotation_horizontal = -gbl::RAYCASTING::FOV_HORIZONTAL * deltaX / i_window.getSize().x;
-        float rotation_vertical = -gbl::RAYCASTING::FOV_VERTICAL * deltaY / i_window.getSize().y;
+        const float rotation_horizontal = -gbl::RAYCASTING::FOV_HORIZONTAL * deltaX / i_window.getSize().x;
+        const float rotation_vertical = -gbl::RAYCASTING::FOV_VERTICAL * deltaY / i_window.getSize().y;
 
         direction.x = normalize_degrees(direction.x + rotation_horizontal);
         direction.y = std::clamp<float>(direction.y + rotation_vertical, -gbl::RAYCASTING::MAX_VERTICAL_DIRECTION, gbl::RAYCASTING::MAX_VERTICAL_DIRECTION);
@@ -86,30 +88,30 @@ void Player::update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_m
             step_y -= gbl::PLAYER::MOVEMENT_SPEED * deltaTime * sin(degrees_to_radians(direction.x));
         }
 
-        if (1 == finish_collision(step_x + position.x, step_y + position.y, i_map))
+        if (finish_collision(step_x + position.x, step_y + position.y, i_map) == true)
         {
             game_state = GameState::GAME_VICTORY;
         }
 
-        if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
+        if (map_collision(step_x + position.x, step_y + position.y, i_map) == false)
         {
             position.x += step_x;
             position.y += step_y;
         }
-        else if (0 == map_collision(step_x + position.x, position.y, i_map))
+        else if (map_collision(step_x + position.x, position.y, i_map) == false)
         {
             position.x += step_x;
-            position.y = round(position.y);
+            position.y = std::round(position.y);
         }
-        else if (0 == map_collision(position.x, step_y + position.y, i_map))
+        else if (map_collision(position.x, step_y + position.y, i_map) == false)
         {
-            position.x = round(position.x);
+            position.x = std::round(position.x);
             position.y += step_y;
         }
         else
         {
-            position.x = round(position.x);
-            position.y = round(position.y);
+            position.x = std::round(position.x);
+            position.y = std::round(position.y);
         }
     }
     else
