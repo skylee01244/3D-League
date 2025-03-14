@@ -11,10 +11,10 @@
 #include "Headers/Teemo.h"
 
 Teemo::Teemo(SpriteManager& i_sprite_manager, float i_x, float i_y) :
-	in_the_view(0),
-	caught(0),
-	direction(0),
-	distance(0),
+	in_view(false),
+	caught(false),
+	direction(0.0f),
+	distance(0.0f),
 	screen_x(0),
 	current_frame(0),
 	position(i_x, i_y),
@@ -45,7 +45,8 @@ float Teemo::get_distance() const
 
 int Teemo::get_height() const
 {
-	return round(gbl::SCREEN::HEIGHT / (distance * tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL))));
+	float projectionFactor = distance * std::tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
+	return static_cast<int>(std::round(gbl::SCREEN::HEIGHT / projectionFactor));
 }
 
 int Teemo::get_width() const
@@ -53,17 +54,18 @@ int Teemo::get_width() const
 	float sprite_height = sprite_manager->get_sprite_data("TEEMO").texture_box.height;
 	float sprite_width = sprite_manager->get_sprite_data("TEEMO").texture_box.width;
 
-	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
+	float projectionFactor = distance * sprite_height * std::tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
+	return static_cast<int>(std::round(gbl::SCREEN::HEIGHT * sprite_width / projectionFactor));
 }
 
 int Teemo::get_x() const
 {
-	return screen_x - round(0.5f * get_width());
+	return screen_x - static_cast<int>(std::round(0.5f * get_width()));
 }
 
 int Teemo::get_y() const
 {
-	return round(0.5f * (gbl::SCREEN::HEIGHT - get_height()));
+	return static_cast<int>(std::round(0.5f * (gbl::SCREEN::HEIGHT - get_height())));
 }
 
 void Teemo::draw(const short i_pitch, sf::RenderWindow& i_window)
@@ -71,11 +73,11 @@ void Teemo::draw(const short i_pitch, sf::RenderWindow& i_window)
 	float sprite_height = sprite_manager->get_sprite_data("TEEMO").texture_box.height;
 	float sprite_width = sprite_manager->get_sprite_data("TEEMO").texture_box.width;
 
-	unsigned char shade = 255 * std::clamp<float>(1 - distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
+	unsigned char shade = static_cast<unsigned char>(255 * std::clamp<float>(1 - distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1));
 
-	in_the_view &= gbl::SCREEN::HEIGHT > i_pitch + get_y() && gbl::SCREEN::WIDTH > get_x() && get_x() > -1 * get_width() && i_pitch + get_y() > -1 * get_height();
+	in_view &= gbl::SCREEN::HEIGHT > i_pitch + get_y() && gbl::SCREEN::WIDTH > get_x() && get_x() > -1 * get_width() && i_pitch + get_y() > -1 * get_height();
 
-	if (0 < shade && 1 == in_the_view)
+	if (shade > 0 && in_view)
 	{
 		sprite_manager->draw_sprite(current_frame, "TEEMO", sf::Vector2<short>(get_x(), i_pitch + get_y()), i_window, 0, 0, get_width() / sprite_width, get_height() / sprite_height, sf::Color(shade, shade, shade));
 	}
@@ -83,8 +85,7 @@ void Teemo::draw(const short i_pitch, sf::RenderWindow& i_window)
 
 void Teemo::fill_map(const gbl::MAP::Map<>& i_map)
 {
-	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
-	{
+	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++) {
 		for (unsigned short b = 0; b < gbl::MAP::ROWS; b++)
 		{
 			if (gbl::MAP::Cell::Empty != i_map[a][b])
@@ -112,6 +113,7 @@ void Teemo::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_playe
 {
 	if (1 == i_window.hasFocus())
 	{
+		// angle between enemy and player
 		float angle = normalize_radians(atan2(i_player_position.y - position.y, position.x - i_player_position.x));
 		float difference = degrees_difference(i_player_direction.x, radians_to_degrees(angle));
 		float frame_angle = 360.f / sprite_manager->get_sprite_data("TEEMO").total_frames;
@@ -120,7 +122,6 @@ void Teemo::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_playe
 		float step_x = 0;
 		float step_y = 0;
 
-		//We're taking the cells that are closest to Steven and the player as starting and finishing cells.
 		sf::Vector2<unsigned short> finish_position(round(i_player_position.x), round(i_player_position.y));
 		sf::Vector2<unsigned short> start_position(round(position.x), round(position.y));
 
@@ -134,12 +135,12 @@ void Teemo::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_playe
 			speed = gbl::ENEMY::MOVEMENT_SPEED;
 		}
 
-		if (1 > sqrt(pow(position.x - i_player_position.x, 2) + pow(position.y - i_player_position.y, 2)))
+		if (1 > std::sqrt(pow(position.x - i_player_position.x, 2) + pow(position.y - i_player_position.y, 2)))
 		{
 			caught = 1;
 		}
 
-		//Steven moves to the next cell in the A star path.
+		// Compute step increments towards the next cell along x and y axes.
 		if (next_cell.x < position.x)
 		{
 			step_x = std::max(-speed * deltaTime, next_cell.x - position.x);
@@ -158,17 +159,18 @@ void Teemo::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_playe
 			step_y = std::min(speed * deltaTime, next_cell.y - position.y);
 		}
 
-		if (0 == map_collision(step_x + position.x, step_y + position.y, i_map))
+		// Update position based on collision detection.
+		if (map_collision(step_x + position.x, step_y + position.y, i_map) == false)
 		{
 			position.x += step_x;
 			position.y += step_y;
 		}
-		else if (0 == map_collision(step_x + position.x, position.y, i_map))
+		else if (map_collision(step_x + position.x, position.y, i_map) == false)
 		{
 			position.x += step_x;
 			position.y = round(position.y);
 		}
-		else if (0 == map_collision(position.x, step_y + position.y, i_map))
+		else if (map_collision(position.x, step_y + position.y, i_map) == false)
 		{
 			position.x = round(position.x);
 			position.y += step_y;
@@ -179,7 +181,6 @@ void Teemo::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_playe
 			position.y = round(position.y);
 		}
 
-		//This makes it so that the difference is between -180 to 180.
 		if (degrees_difference(i_player_direction.x, difference + radians_to_degrees(angle)) < degrees_difference(i_player_direction.x, radians_to_degrees(angle) - difference))
 		{
 			difference *= -1;
@@ -187,14 +188,14 @@ void Teemo::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_playe
 
 		shifted_direction = normalize_degrees(90 + normalize_degrees(direction + 0.5f * frame_angle) - difference - i_player_direction.x);
 
-		//Calculating the perpendicular distance from Steven to the player.
-		distance = abs(i_player_position.y - position.y - tan(degrees_to_radians(i_player_direction.x - 90)) * (position.x - i_player_position.x)) / sqrt(1 + pow(tan(degrees_to_radians(i_player_direction.x - 90)), 2));
+		//perpendicular distance 
+		distance = std::abs(i_player_position.y - position.y - tan(degrees_to_radians(i_player_direction.x - 90)) * (position.x - i_player_position.x)) / sqrt(1 + pow(tan(degrees_to_radians(i_player_direction.x - 90)), 2));
 
 		screen_x = round(0.5f * gbl::SCREEN::WIDTH * (1 - tan(degrees_to_radians(difference)) / tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 
-		in_the_view = 90 > abs(difference);
+		in_view = std::abs(difference) < 90;
 
-		current_frame = floor(shifted_direction / frame_angle);
+		current_frame = static_cast<int>(std::floor(shifted_direction / frame_angle));
 	}
 }
 

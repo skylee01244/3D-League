@@ -192,7 +192,7 @@ void Lulu::update(const sf::RenderWindow& i_window, const sf::Vector2f& i_player
 
 		screen_x = round(0.5f * gbl::SCREEN::WIDTH * (1 - std::tan(degrees_to_radians(difference)) / std::tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 
-		in_view = abs(difference) < 90;
+		in_view = std::abs(difference) < 90;
 
 		current_frame = static_cast<int>(std::floor(shifted_direction / frame_angle));
 	}
