@@ -3,7 +3,7 @@
 
 class Lulu
 {
-	bool in_the_view;
+	bool in_view;
 	bool caught;
 
 	float direction;
