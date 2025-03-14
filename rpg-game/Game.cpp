@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <limits>
 #include <iostream>
+#include <cmath>
+#include <algorithm>
 
 #include "Headers/Global.h"
 #include "Headers/AngleFunctions.h"
@@ -18,6 +20,24 @@
 #include "Headers/Teemo.h"
 #include "Headers/GameState.h"
 
+namespace {
+	constexpr float START_BUTTON_WIDTH = 85.f;
+	constexpr float START_BUTTON_HEIGHT = 125.f;
+	constexpr float START_BUTTON_POS_X = 545.f;
+	constexpr float START_BUTTON_POS_Y = 20.f;
+
+	constexpr float QUIT_BUTTON_WIDTH = 110.f;
+	constexpr float QUIT_BUTTON_HEIGHT = 60.f;
+	constexpr float QUIT_BUTTON_POS_X = 180.f;
+	constexpr float QUIT_BUTTON_POS_Y = 235.f;
+
+	constexpr float RESTART_BUTTON_WIDTH = 110.f;
+	constexpr float RESTART_BUTTON_HEIGHT = 60.f;
+	constexpr float RESTART_BUTTON_POS_X = 350.f;
+	constexpr float RESTART_BUTTON_POS_Y = 235.f;
+}
+
+
 
 void Game::setFrameRateLimit(unsigned int limit)
 {
@@ -26,7 +46,7 @@ void Game::setFrameRateLimit(unsigned int limit)
 
 Game::Game() :
 	show_map(0),
-	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "Raycasting", sf::Style::Default),
+	window(sf::VideoMode(gbl::SCREEN::RESIZE * gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE * gbl::SCREEN::HEIGHT), "Pixel Pursuit", sf::Style::Default),
 	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
 	lulu(sprite_manager),
 	teemo(sprite_manager),
@@ -39,7 +59,7 @@ void Game::initialise() {
 	game_state = GameState::GAME_START;
 	show_map = false;
 
-	window.setMouseCursorVisible(1);
+	window.setMouseCursorVisible(true);
 	window.setView(sf::View(sf::FloatRect(0, 0, gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT)));
 
 	player = Player();
@@ -54,14 +74,23 @@ void Game::initialise() {
 		stripe.set_sprite_manager(sprite_manager);
 	}
 
-	startButton.setSize(sf::Vector2f(85, 125));
+	/*startButton.setSize(sf::Vector2f(85, 125));
 	startButton.setPosition(545, 20);
 
 	quitButton.setSize(sf::Vector2f(110, 60));
 	quitButton.setPosition(180, 235);
 
 	restartButton.setSize(sf::Vector2f(110, 60));
-	restartButton.setPosition(350, 235);
+	restartButton.setPosition(350, 235);*/
+
+	startButton.setSize(sf::Vector2f(START_BUTTON_WIDTH, START_BUTTON_HEIGHT));
+	startButton.setPosition(START_BUTTON_POS_X, START_BUTTON_POS_Y);
+
+	quitButton.setSize(sf::Vector2f(QUIT_BUTTON_WIDTH, QUIT_BUTTON_HEIGHT));
+	quitButton.setPosition(QUIT_BUTTON_POS_X, QUIT_BUTTON_POS_Y);
+
+	restartButton.setSize(sf::Vector2f(RESTART_BUTTON_WIDTH, RESTART_BUTTON_HEIGHT));
+	restartButton.setPosition(RESTART_BUTTON_POS_X, RESTART_BUTTON_POS_Y);
 }
 
 void Game::restart()
@@ -75,18 +104,17 @@ bool Game::is_open() const
 }
 
 void Game::updateFOV() {
-	// Calculate the start position based on player position
-	sf::Vector2f startPosition(
+	const sf::Vector2f startPosition(
 		gbl::MAP::CELL_SIZE * (0.5f + player.get_position().x),
 		gbl::MAP::CELL_SIZE * (0.5f + player.get_position().y)
 	);
 
 	fov_visualization[0].position = startPosition;
 
-	// Update FOV visualization for each stripe
+	// Update FOV for each stripe on the screen.
 	for (unsigned short i = 0; i < gbl::SCREEN::WIDTH; ++i) {
-		float distance = stripes[i].get_true_distance();
-		float angle = stripes[i].get_angle();
+		const float distance = stripes[i].get_true_distance();
+		const float angle = stripes[i].get_angle();
 
 		fov_visualization[1 + i].position = sf::Vector2f(
 			startPosition.x + gbl::MAP::CELL_SIZE * distance * cos(angle),
@@ -97,19 +125,18 @@ void Game::updateFOV() {
 
 void Game::draw() {
 	switch (game_state) {
-	case GameState::GAME_START:
-		draw_start_screen();
-		break;
-	case GameState::GAME_PLAYING:
-		//draw_gameplay();
-		renderGameplay();
-		break;
-	case GameState::GAME_END:
-		draw_end_screen();
-		break;
-	case GameState::GAME_VICTORY:
-		draw_victory_screen();
-		break;
+		case GameState::GAME_START:
+			draw_start_screen();
+			break;
+		case GameState::GAME_PLAYING:
+			renderGameplay();
+			break;
+		case GameState::GAME_END:
+			draw_end_screen();
+			break;
+		case GameState::GAME_VICTORY:
+			draw_victory_screen();
+			break;
 	}
 	window.display();
 }
@@ -117,54 +144,60 @@ void Game::draw() {
 void Game::draw_start_screen() {
 	sf::Vector2<short> position(0, 0);
 	sf::Color color = sf::Color::White;
-	auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
-	sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+
+	// Start Screen
+	const auto& spriteData = sprite_manager.get_sprite_data("StartScreen");
+	const sf::Rect<unsigned short> textureBox = spriteData.texture_box;
 	sprite_manager.draw_sprite(0, "StartScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
 
 	// Start button
-	auto& startButtonSpriteData = sprite_manager.get_sprite_data("StartButton");
-	sf::Vector2<short> startButtonPosition(545, 20);
-	sf::Rect<unsigned short> startButtonTextureBox = startButtonSpriteData.texture_box;
+	const auto& startButtonSpriteData = sprite_manager.get_sprite_data("StartButton");
+	const sf::Vector2<short> startButtonPosition(545, 20);
+	const sf::Rect<unsigned short> startButtonTextureBox = startButtonSpriteData.texture_box;
 	sprite_manager.draw_sprite(0, "StartButton", startButtonPosition, window, false, false, 1.0f, 1.0f, color, startButtonTextureBox);
 }
 
 void Game::draw_end_screen() {
 	sf::Vector2<short> position(0, 0);
 	sf::Color color = sf::Color::White;
-	auto& spriteData = sprite_manager.get_sprite_data("EndScreen");
-	sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+
+	// End Screen
+	const auto& spriteData = sprite_manager.get_sprite_data("EndScreen");
+	const sf::Rect<unsigned short> textureBox = spriteData.texture_box;
 	sprite_manager.draw_sprite(0, "EndScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
 
 	// Quit button
-	auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
-	sf::Vector2<short> quitButtonPosition(180, 235);
-	sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
+	const auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
+	const sf::Vector2<short> quitButtonPosition(180, 235);
+	const sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
 	sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
 
 	// Restart button
-	auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
-	sf::Vector2<short> restartButtonPosition(350, 235);
-	sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
+	const auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
+	const sf::Vector2<short> restartButtonPosition(350, 235);
+	const sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
 	sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
 }
 
 void Game::draw_victory_screen() {
 	sf::Vector2<short> position(0, 0);
 	sf::Color color = sf::Color::White;
-	auto& spriteData = sprite_manager.get_sprite_data("VictoryScreen");
-	sf::Rect<unsigned short> textureBox = spriteData.texture_box;
+
+	// Victory Screen
+	const auto& spriteData = sprite_manager.get_sprite_data("VictoryScreen");
+	const sf::Rect<unsigned short> textureBox = spriteData.texture_box;
 	sprite_manager.draw_sprite(0, "VictoryScreen", position, window, false, false, 1.0f, 1.0f, color, textureBox);
 
 	// Quit button
-	auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
-	sf::Vector2<short> quitButtonPosition(180, 235);
-	sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
+	const auto& quitButtonSpriteData = sprite_manager.get_sprite_data("QuitButton");
+	const sf::Vector2<short> quitButtonPosition(180, 235);
+	const sf::Rect<unsigned short> quitButtonTextureBox = quitButtonSpriteData.texture_box;
 	sprite_manager.draw_sprite(0, "QuitButton", quitButtonPosition, window, false, false, 1.0f, 1.0f, color, quitButtonTextureBox);
 
 	// Restart button
-	auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
-	sf::Vector2<short> restartButtonPosition(350, 235);
-	sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
+	const auto& restartButtonSpriteData = sprite_manager.get_sprite_data("PlayButton");
+	const sf::Vector2<short> restartButtonPosition(350, 235);
+	const sf::Rect<unsigned short> restartButtonTextureBox = restartButtonSpriteData.texture_box;
 	sprite_manager.draw_sprite(0, "PlayButton", restartButtonPosition, window, false, false, 1.0f, 1.0f, color, restartButtonTextureBox);
 }
 
@@ -177,13 +210,14 @@ void Game::renderGameplay() {
 	bool isLuluDrawn = false;
 	bool isTeemoDrawn = false;
 
-	float startStripeX = -tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
-	float endStripeX = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
-	float verticalFovRatio = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
-	short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(degrees_to_radians(player.get_direction().y)));
-	unsigned short floorStartY = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
+	const float startStripeX = -tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL));
+	const float endStripeX = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (1 - 2.f / gbl::SCREEN::WIDTH);
+	const float verticalFovRatio = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_VERTICAL));
+	const short pitch = round(0.5f * gbl::SCREEN::HEIGHT * tan(degrees_to_radians(player.get_direction().y)));
+	const unsigned short floorStartY = std::clamp<float>(pitch + 0.5f * gbl::SCREEN::HEIGHT, 0, gbl::SCREEN::HEIGHT);
 
-	gbl::SpriteData floorSpriteData = sprite_manager.get_sprite_data("FLOOR");
+	// Floor sprite & Image buffer
+	const const gbl::SpriteData floorSpriteData = sprite_manager.get_sprite_data("FLOOR");
 	sf::Image floorImage, floorBufferImage;
 	floorImage.loadFromFile(floorSpriteData.image_location);
 	floorBufferImage.create(gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT - floorStartY);
@@ -192,19 +226,20 @@ void Game::renderGameplay() {
 	floorSprite.setPosition(0, floorStartY);
 	sf::Texture floorTexture;
 
-	float playerDirection = degrees_to_radians(player.get_direction().x);
-	float playerDirectionOffset = degrees_to_radians(player.get_direction().x - 90);
-	float rayDirStartX = cos(playerDirection) + startStripeX * cos(playerDirectionOffset);
-	float rayDirStartY = -sin(playerDirection) - startStripeX * sin(playerDirectionOffset);
-	float rayDirEndX = cos(playerDirection) + endStripeX * cos(playerDirectionOffset);
-	float rayDirEndY = -sin(playerDirection) - endStripeX * sin(playerDirectionOffset);
+	const float playerDirection = degrees_to_radians(player.get_direction().x);
+	const float playerDirectionOffset = degrees_to_radians(player.get_direction().x - 90);
+	const float rayDirStartX = cos(playerDirection) + startStripeX * cos(playerDirectionOffset);
+	const float rayDirStartY = -sin(playerDirection) - startStripeX * sin(playerDirectionOffset);
+	const float rayDirEndX = cos(playerDirection) + endStripeX * cos(playerDirectionOffset);
+	const float rayDirEndY = -sin(playerDirection) - endStripeX * sin(playerDirectionOffset);
 
 	window.clear();
 
+	// Render floor
 	for (unsigned short y = floorStartY; y < gbl::SCREEN::HEIGHT; ++y) {
-		short rowY = y - pitch - 0.5f * gbl::SCREEN::HEIGHT;
-		float rowDistance = (rowY == 0) ? std::numeric_limits<float>::max() : 0.5f * gbl::SCREEN::HEIGHT / (rowY * verticalFovRatio);
-		unsigned char shade = 255 * std::clamp<float>(1 - rowDistance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
+		const short rowY = y - pitch - 0.5f * gbl::SCREEN::HEIGHT;
+		const float rowDistance = (rowY == 0) ? std::numeric_limits<float>::max() : 0.5f * gbl::SCREEN::HEIGHT / (rowY * verticalFovRatio);
+		const unsigned char shade = 255 * std::clamp<float>(1 - rowDistance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
 
 		if (shade > 0) {
 			float floorStepX = rowDistance * (rayDirEndX - rayDirStartX) / gbl::SCREEN::WIDTH;
@@ -216,7 +251,7 @@ void Game::renderGameplay() {
 				unsigned int textureX = static_cast<unsigned int>(floorSpriteData.texture_box.width * (5 + floorX - floor(floorX)));
 				unsigned int textureY = static_cast<unsigned int>(floorSpriteData.texture_box.height * (floorY - floor(floorY)));
 
-				// check bounds of the image
+				// bounds
 				textureX = std::clamp(textureX, 0u, floorImage.getSize().x - 1);
 				textureY = std::clamp(textureY, 0u, floorImage.getSize().y - 1);
 
@@ -240,13 +275,15 @@ void Game::renderGameplay() {
 
 	unsigned short decorationIndex = 0;
 
+	// Lambda to decide when to draw a enemy relative to the decorations.
 	auto drawCharacter = [&](auto& character, bool& isDrawn) {
 		if (!isDrawn && decorationIndex < decorations.size() && character.get_distance() > decorations[decorationIndex].get_distance()) {
 			isDrawn = true;
 			character.draw(pitch, window);
 		}
-		};
+	};
 
+	// Draw stripes & decorations in order
 	for (Stripe& stripe : stripes) {
 		while (decorationIndex < decorations.size() && stripe.get_distance() < decorations[decorationIndex].get_distance()) {
 			drawCharacter(lulu, isLuluDrawn);
@@ -272,10 +309,10 @@ void Game::renderGameplay() {
 
 void Game::draw_map()
 {
-	float frame_angle = 360.f / sprite_manager.get_sprite_data("MAP_PLAYER").total_frames;
-	float shifted_direction = normalize_degrees(player.get_direction().x + 0.5f * frame_angle);
-	float enemy1_shifted_direction = normalize_degrees(lulu.get_direction() + 0.5f * frame_angle);
-	float enemy2_shifted_direction = normalize_degrees(teemo.get_direction() + 0.5f * frame_angle);
+	const float frame_angle = 360.f / sprite_manager.get_sprite_data("MAP_PLAYER").total_frames;
+	const float shifted_direction = normalize_degrees(player.get_direction().x + 0.5f * frame_angle);
+	const float enemy1_shifted_direction = normalize_degrees(lulu.get_direction() + 0.5f * frame_angle);
+	const float enemy2_shifted_direction = normalize_degrees(teemo.get_direction() + 0.5f * frame_angle);
 
 	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
@@ -286,7 +323,6 @@ void Game::draw_map()
 			case gbl::MAP::Cell::Empty:
 			{
 				sprite_manager.draw_sprite(0, "MAP_CELL", sf::Vector2<short>(gbl::MAP::CELL_SIZE * a, gbl::MAP::CELL_SIZE * b), window);
-
 				break;
 			}
 			default:
@@ -317,15 +353,8 @@ void Game::handle_events()
 			}
 			case sf::Event::KeyPressed:
 			{
-				switch (event.key.code)
-				{
-					case sf::Keyboard::M:
-					{
-						show_map = 1 - show_map;
-						break;
-					}
-					default:
-						break;
+				if (event.key.code == sf::Keyboard::M) {
+					show_map = !show_map;
 				}
 				break;
 			}
@@ -362,14 +391,14 @@ void Game::handle_events()
 
 void Game::performRaycasting()
 {
-	float startX = 0.5f + player.get_position().x;
-	float startY = 0.5f + player.get_position().y;
+	const float startX = 0.5f + player.get_position().x;
+	const float startY = 0.5f + player.get_position().y;
 
 	for (unsigned short x = 0; x < gbl::SCREEN::WIDTH; x++)
 	{
 		char stepX = 0, stepY = 0;
 		float stripeX = tan(degrees_to_radians(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL)) * (2 * x / static_cast<float>(gbl::SCREEN::WIDTH) - 1);
-		float rayAngle, rayDirX, rayDirY, sideX;
+		float rayDirX, rayDirY, sideX;
 		float rayLengthX = 0, rayUnitLengthX, rayLengthY = 0, rayUnitLengthY;
 		unsigned char cellX, cellY, wallSide;
 		gbl::MAP::Cell hitCell;
@@ -379,8 +408,8 @@ void Game::performRaycasting()
 		rayUnitLengthX = (rayDirX == 0) ? std::numeric_limits<float>::max() : std::abs(1 / rayDirX);
 		rayUnitLengthY = (rayDirY == 0) ? std::numeric_limits<float>::max() : std::abs(1 / rayDirY);
 
-		cellX = floor(startX);
-		cellY = floor(startY);
+		cellX = std::floor(startX);
+		cellY = std::floor(startY);
 
 		if (rayDirX < 0)
 		{
@@ -404,6 +433,7 @@ void Game::performRaycasting()
 			rayLengthY = rayUnitLengthY * (1 + cellY - startY);
 		}
 
+		// DDA (Digital Differential Analyzer)
 		while (true)
 		{
 			bool cornerHit = false;
@@ -435,12 +465,12 @@ void Game::performRaycasting()
 
 			if (cellX >= 0 && cellY >= 0 && cellX < gbl::MAP::COLUMNS && cellY < gbl::MAP::ROWS)
 			{
-				if (gbl::MAP::Cell::Empty != map[cellX][cellY])
+				if (map[cellX][cellY] != gbl::MAP::Cell::Empty)
 				{
 					hitCell = map[cellX][cellY];
 					break;
 				}
-				else if (cornerHit && gbl::MAP::Cell::Empty != map[cellX - stepX][cellY] && gbl::MAP::Cell::Empty != map[cellX][cellY - stepY])
+				else if (cornerHit && map[cellX - stepX][cellY] != gbl::MAP::Cell::Empty && map[cellX][cellY - stepY] != gbl::MAP::Cell::Empty)
 				{
 					hitCell = map[cellX - stepX][cellY];
 					break;
@@ -449,6 +479,7 @@ void Game::performRaycasting()
 			else { break; }
 		}
 
+		// Calculate the texture coordinate on the wall.
 		sideX = (wallSide % 2 == 0) ? startY + rayDirY * stripes[x].get_distance() : startX + rayDirX * stripes[x].get_distance();
 		sideX = (wallSide < 2) ? ceil(sideX) - sideX : sideX - floor(sideX);
 
@@ -457,30 +488,30 @@ void Game::performRaycasting()
 		stripes[x].set_side_x(sideX);
 		stripes[x].set_x(x);
 
-		rayAngle = stripes[x].get_angle() - degrees_to_radians(player.get_direction().x);
-		stripes[x].set_true_distance(stripes[x].get_distance() / std::abs(cos(rayAngle)));
+		const float angleDifference = stripes[x].get_angle() - degrees_to_radians(player.get_direction().x);
+		stripes[x].set_true_distance(stripes[x].get_distance() / std::abs(cos(angleDifference)));
 
 		switch (hitCell)
 		{
-		case gbl::MAP::Cell::Wall:
-			stripes[x].set_sprite_name("WALL");
-			break;
-		case gbl::MAP::Cell::TreeWall:
-			stripes[x].set_sprite_name("TREE_WALL");
-			break;
-		case gbl::MAP::Cell::FinishWall:
-			stripes[x].set_sprite_name("FINISH_WALL");
-			break;
-		case gbl::MAP::Cell::BushWall:
-			stripes[x].set_sprite_name("BUSH_WALL");
-			break;
-		case gbl::MAP::Cell::CaveWall:
-			stripes[x].set_sprite_name("CAVE_WALL");
-			break;
-		case gbl::MAP::Cell::Empty:
-			break;
-		default:
-			break;
+			case gbl::MAP::Cell::Wall:
+				stripes[x].set_sprite_name("WALL");
+				break;
+			case gbl::MAP::Cell::TreeWall:
+				stripes[x].set_sprite_name("TREE_WALL");
+				break;
+			case gbl::MAP::Cell::FinishWall:
+				stripes[x].set_sprite_name("FINISH_WALL");
+				break;
+			case gbl::MAP::Cell::BushWall:
+				stripes[x].set_sprite_name("BUSH_WALL");
+				break;
+			case gbl::MAP::Cell::CaveWall:
+				stripes[x].set_sprite_name("CAVE_WALL");
+				break;
+			case gbl::MAP::Cell::Empty:
+				break;
+			default:
+				break;
 		}
 	}
 }
@@ -492,8 +523,6 @@ void Game::update(float deltaTime)
 	}
 	if (game_state == GameState::GAME_PLAYING)
 	{
-		sf::Vector2f player_position = player.get_position();
-
 		player.update(window, map, deltaTime, game_state);
 		lulu.update(window, player.get_direction(), player.get_position(), map, deltaTime);
 		teemo.update(window, player.get_direction(), player.get_position(), map, deltaTime);
